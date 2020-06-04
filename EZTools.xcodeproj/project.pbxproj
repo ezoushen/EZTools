@@ -35,17 +35,75 @@
 		15780D312488A8B200CEC574 /* DelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780D262488A8B200CEC574 /* DelegateProxy.swift */; };
 		15780D322488A8B200CEC574 /* UIControl+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780D292488A8B200CEC574 /* UIControl+Combine.swift */; };
 		15780D332488A8B200CEC574 /* Gesture+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780D242488A8B200CEC574 /* Gesture+Combine.swift */; };
+		15D13DA62488CEDB0098E03B /* AppArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 15780D052488A88800CEC574 /* AppArchitecture.framework */; };
+		15D13DA72488CEDB0098E03B /* AppArchitecture.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 15780D052488A88800CEC574 /* AppArchitecture.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		15780CC92488A78200CEC574 /* PBXContainerItemProxy */ = {
+		15780D4B2488C97F00CEC574 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 15780CB82488A67800CEC574;
 			remoteInfo = Localization;
 		};
+		15780D542488CC6C00CEC574 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 15780CCF2488A7FF00CEC574;
+			remoteInfo = FontCase;
+		};
+		15780D562488CC6E00CEC574 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 15780CE22488A85100CEC574;
+			remoteInfo = SwiftUIPreview;
+		};
+		15780D582488CC6F00CEC574 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 15780CF12488A86800CEC574;
+			remoteInfo = LayoutEngine;
+		};
+		15780D5A2488CC7000CEC574 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 15780D042488A88800CEC574;
+			remoteInfo = AppArchitecture;
+		};
+		15780D5C2488CC7100CEC574 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 15780D1B2488A8A600CEC574;
+			remoteInfo = CombineCocoa;
+		};
+		15D13DA82488CEDB0098E03B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 15780D042488A88800CEC574;
+			remoteInfo = AppArchitecture;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		15D13DAA2488CEDB0098E03B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = "";
+			dstSubfolderSpec = 1;
+			files = (
+				15D13DA72488CEDB0098E03B /* AppArchitecture.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		15780CA92488A54900CEC574 /* EZTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EZTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -97,6 +155,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15D13DA62488CEDB0098E03B /* AppArchitecture.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,6 +215,7 @@
 				15780D062488A88800CEC574 /* AppArchitecture */,
 				15780D1D2488A8A600CEC574 /* CombineCocoa */,
 				15780CAA2488A54900CEC574 /* Products */,
+				15780D382488C97F00CEC574 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -257,6 +317,13 @@
 			path = CombineCocoa;
 			sourceTree = "<group>";
 		};
+		15780D382488C97F00CEC574 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -327,11 +394,18 @@
 				15780CA52488A54900CEC574 /* Sources */,
 				15780CA62488A54900CEC574 /* Frameworks */,
 				15780CA72488A54900CEC574 /* Resources */,
+				15D13DAA2488CEDB0098E03B /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				15780CCA2488A78200CEC574 /* PBXTargetDependency */,
+				15780D592488CC6F00CEC574 /* PBXTargetDependency */,
+				15780D4C2488C97F00CEC574 /* PBXTargetDependency */,
+				15780D552488CC6C00CEC574 /* PBXTargetDependency */,
+				15780D5B2488CC7000CEC574 /* PBXTargetDependency */,
+				15780D572488CC6E00CEC574 /* PBXTargetDependency */,
+				15780D5D2488CC7100CEC574 /* PBXTargetDependency */,
+				15D13DA92488CEDB0098E03B /* PBXTargetDependency */,
 			);
 			name = EZTools;
 			productName = EZTools;
@@ -629,10 +703,40 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		15780CCA2488A78200CEC574 /* PBXTargetDependency */ = {
+		15780D4C2488C97F00CEC574 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 15780CB82488A67800CEC574 /* Localization */;
-			targetProxy = 15780CC92488A78200CEC574 /* PBXContainerItemProxy */;
+			targetProxy = 15780D4B2488C97F00CEC574 /* PBXContainerItemProxy */;
+		};
+		15780D552488CC6C00CEC574 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 15780CCF2488A7FF00CEC574 /* FontCase */;
+			targetProxy = 15780D542488CC6C00CEC574 /* PBXContainerItemProxy */;
+		};
+		15780D572488CC6E00CEC574 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 15780CE22488A85100CEC574 /* SwiftUIPreview */;
+			targetProxy = 15780D562488CC6E00CEC574 /* PBXContainerItemProxy */;
+		};
+		15780D592488CC6F00CEC574 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 15780CF12488A86800CEC574 /* LayoutEngine */;
+			targetProxy = 15780D582488CC6F00CEC574 /* PBXContainerItemProxy */;
+		};
+		15780D5B2488CC7000CEC574 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 15780D042488A88800CEC574 /* AppArchitecture */;
+			targetProxy = 15780D5A2488CC7000CEC574 /* PBXContainerItemProxy */;
+		};
+		15780D5D2488CC7100CEC574 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 15780D1B2488A8A600CEC574 /* CombineCocoa */;
+			targetProxy = 15780D5C2488CC7100CEC574 /* PBXContainerItemProxy */;
+		};
+		15D13DA92488CEDB0098E03B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 15780D042488A88800CEC574 /* AppArchitecture */;
+			targetProxy = 15D13DA82488CEDB0098E03B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -688,7 +792,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -745,7 +849,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -762,7 +866,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -786,7 +890,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -811,7 +915,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -838,7 +942,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -863,7 +967,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -888,7 +992,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -913,7 +1017,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -938,7 +1042,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -963,7 +1067,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -988,7 +1092,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1013,7 +1117,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1038,7 +1142,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1063,7 +1167,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1088,7 +1192,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6RTPJGVKB3;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
