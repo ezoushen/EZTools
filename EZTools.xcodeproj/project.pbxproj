@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		15780CAE2488A54900CEC574 /* EZTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 15780CAC2488A54900CEC574 /* EZTools.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		15780CBD2488A67800CEC574 /* Localization.h in Headers */ = {isa = PBXBuildFile; fileRef = 15780CBB2488A67800CEC574 /* Localization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		15780CC62488A6B300CEC574 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780CC52488A6B300CEC574 /* Localized.swift */; };
 		15780CD42488A7FF00CEC574 /* FontCase.h in Headers */ = {isa = PBXBuildFile; fileRef = 15780CD22488A7FF00CEC574 /* FontCase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -35,80 +34,9 @@
 		15780D312488A8B200CEC574 /* DelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780D262488A8B200CEC574 /* DelegateProxy.swift */; };
 		15780D322488A8B200CEC574 /* UIControl+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780D292488A8B200CEC574 /* UIControl+Combine.swift */; };
 		15780D332488A8B200CEC574 /* Gesture+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780D242488A8B200CEC574 /* Gesture+Combine.swift */; };
-		15D13DA62488CEDB0098E03B /* AppArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 15780D052488A88800CEC574 /* AppArchitecture.framework */; };
-		15D13DA72488CEDB0098E03B /* AppArchitecture.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 15780D052488A88800CEC574 /* AppArchitecture.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		15780D4B2488C97F00CEC574 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 15780CB82488A67800CEC574;
-			remoteInfo = Localization;
-		};
-		15780D542488CC6C00CEC574 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 15780CCF2488A7FF00CEC574;
-			remoteInfo = FontCase;
-		};
-		15780D562488CC6E00CEC574 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 15780CE22488A85100CEC574;
-			remoteInfo = SwiftUIPreview;
-		};
-		15780D582488CC6F00CEC574 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 15780CF12488A86800CEC574;
-			remoteInfo = LayoutEngine;
-		};
-		15780D5A2488CC7000CEC574 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 15780D042488A88800CEC574;
-			remoteInfo = AppArchitecture;
-		};
-		15780D5C2488CC7100CEC574 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 15780D1B2488A8A600CEC574;
-			remoteInfo = CombineCocoa;
-		};
-		15D13DA82488CEDB0098E03B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 15780CA02488A54900CEC574 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 15780D042488A88800CEC574;
-			remoteInfo = AppArchitecture;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		15D13DAA2488CEDB0098E03B /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 8;
-			dstPath = "";
-			dstSubfolderSpec = 1;
-			files = (
-				15D13DA72488CEDB0098E03B /* AppArchitecture.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		15780CA92488A54900CEC574 /* EZTools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EZTools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		15780CAC2488A54900CEC574 /* EZTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EZTools.h; sourceTree = "<group>"; };
-		15780CAD2488A54900CEC574 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		15780CB92488A67800CEC574 /* Localization.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Localization.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		15780CBB2488A67800CEC574 /* Localization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Localization.h; sourceTree = "<group>"; };
 		15780CBC2488A67800CEC574 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -151,14 +79,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		15780CA62488A54900CEC574 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				15D13DA62488CEDB0098E03B /* AppArchitecture.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		15780CB62488A67800CEC574 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -207,7 +127,6 @@
 		15780C9F2488A54900CEC574 = {
 			isa = PBXGroup;
 			children = (
-				15780CAB2488A54900CEC574 /* EZTools */,
 				15780CBA2488A67800CEC574 /* Localization */,
 				15780CD12488A7FF00CEC574 /* FontCase */,
 				15780CE42488A85100CEC574 /* SwiftUIPreview */,
@@ -222,7 +141,6 @@
 		15780CAA2488A54900CEC574 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				15780CA92488A54900CEC574 /* EZTools.framework */,
 				15780CB92488A67800CEC574 /* Localization.framework */,
 				15780CD02488A7FF00CEC574 /* FontCase.framework */,
 				15780CE32488A85100CEC574 /* SwiftUIPreview.framework */,
@@ -231,15 +149,6 @@
 				15780D1C2488A8A600CEC574 /* CombineCocoa.framework */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		15780CAB2488A54900CEC574 /* EZTools */ = {
-			isa = PBXGroup;
-			children = (
-				15780CAC2488A54900CEC574 /* EZTools.h */,
-				15780CAD2488A54900CEC574 /* Info.plist */,
-			);
-			path = EZTools;
 			sourceTree = "<group>";
 		};
 		15780CBA2488A67800CEC574 /* Localization */ = {
@@ -327,14 +236,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		15780CA42488A54900CEC574 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				15780CAE2488A54900CEC574 /* EZTools.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		15780CB42488A67800CEC574 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -386,32 +287,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		15780CA82488A54900CEC574 /* EZTools */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 15780CB12488A54900CEC574 /* Build configuration list for PBXNativeTarget "EZTools" */;
-			buildPhases = (
-				15780CA42488A54900CEC574 /* Headers */,
-				15780CA52488A54900CEC574 /* Sources */,
-				15780CA62488A54900CEC574 /* Frameworks */,
-				15780CA72488A54900CEC574 /* Resources */,
-				15D13DAA2488CEDB0098E03B /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				15780D592488CC6F00CEC574 /* PBXTargetDependency */,
-				15780D4C2488C97F00CEC574 /* PBXTargetDependency */,
-				15780D552488CC6C00CEC574 /* PBXTargetDependency */,
-				15780D5B2488CC7000CEC574 /* PBXTargetDependency */,
-				15780D572488CC6E00CEC574 /* PBXTargetDependency */,
-				15780D5D2488CC7100CEC574 /* PBXTargetDependency */,
-				15D13DA92488CEDB0098E03B /* PBXTargetDependency */,
-			);
-			name = EZTools;
-			productName = EZTools;
-			productReference = 15780CA92488A54900CEC574 /* EZTools.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 		15780CB82488A67800CEC574 /* Localization */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 15780CC02488A67800CEC574 /* Build configuration list for PBXNativeTarget "Localization" */;
@@ -529,9 +404,6 @@
 				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = ezoushen;
 				TargetAttributes = {
-					15780CA82488A54900CEC574 = {
-						CreatedOnToolsVersion = 11.5;
-					};
 					15780CB82488A67800CEC574 = {
 						CreatedOnToolsVersion = 11.5;
 						LastSwiftMigration = 1150;
@@ -566,7 +438,6 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				15780CA82488A54900CEC574 /* EZTools */,
 				15780CB82488A67800CEC574 /* Localization */,
 				15780CCF2488A7FF00CEC574 /* FontCase */,
 				15780CE22488A85100CEC574 /* SwiftUIPreview */,
@@ -578,13 +449,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		15780CA72488A54900CEC574 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		15780CB72488A67800CEC574 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -630,13 +494,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		15780CA52488A54900CEC574 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		15780CB52488A67800CEC574 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -701,44 +558,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		15780D4C2488C97F00CEC574 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 15780CB82488A67800CEC574 /* Localization */;
-			targetProxy = 15780D4B2488C97F00CEC574 /* PBXContainerItemProxy */;
-		};
-		15780D552488CC6C00CEC574 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 15780CCF2488A7FF00CEC574 /* FontCase */;
-			targetProxy = 15780D542488CC6C00CEC574 /* PBXContainerItemProxy */;
-		};
-		15780D572488CC6E00CEC574 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 15780CE22488A85100CEC574 /* SwiftUIPreview */;
-			targetProxy = 15780D562488CC6E00CEC574 /* PBXContainerItemProxy */;
-		};
-		15780D592488CC6F00CEC574 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 15780CF12488A86800CEC574 /* LayoutEngine */;
-			targetProxy = 15780D582488CC6F00CEC574 /* PBXContainerItemProxy */;
-		};
-		15780D5B2488CC7000CEC574 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 15780D042488A88800CEC574 /* AppArchitecture */;
-			targetProxy = 15780D5A2488CC7000CEC574 /* PBXContainerItemProxy */;
-		};
-		15780D5D2488CC7100CEC574 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 15780D1B2488A8A600CEC574 /* CombineCocoa */;
-			targetProxy = 15780D5C2488CC7100CEC574 /* PBXContainerItemProxy */;
-		};
-		15D13DA92488CEDB0098E03B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 15780D042488A88800CEC574 /* AppArchitecture */;
-			targetProxy = 15D13DA82488CEDB0098E03B /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		15780CAF2488A54900CEC574 /* Debug */ = {
@@ -858,54 +677,6 @@
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		15780CB22488A54900CEC574 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = EZTools/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ezoushen.EZTools;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		15780CB32488A54900CEC574 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = EZTools/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ezoushen.EZTools;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1220,15 +991,6 @@
 			buildConfigurations = (
 				15780CAF2488A54900CEC574 /* Debug */,
 				15780CB02488A54900CEC574 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		15780CB12488A54900CEC574 /* Build configuration list for PBXNativeTarget "EZTools" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				15780CB22488A54900CEC574 /* Debug */,
-				15780CB32488A54900CEC574 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
