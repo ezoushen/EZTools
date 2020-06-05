@@ -54,7 +54,9 @@ extension ViewModel where Self: ObservableObject {
     }
 }
 
-public final class EmptyViewModel: ViewModel { }
+public final class EmptyViewModel: ViewModel {
+    public init() { }
+}
 
 @dynamicMemberLookup
 public struct Bindable<T> {
