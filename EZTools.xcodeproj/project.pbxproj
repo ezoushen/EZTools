@@ -3,10 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		150E5D022491DB76001E88F1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 150E5D002491DB65001E88F1 /* UIKit.framework */; platformFilter = ios; };
+		150E5D062491DBC1001E88F1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 150E5D052491DBC1001E88F1 /* SwiftUI.framework */; };
 		15780CBD2488A67800CEC574 /* Localization.h in Headers */ = {isa = PBXBuildFile; fileRef = 15780CBB2488A67800CEC574 /* Localization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		15780CC62488A6B300CEC574 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780CC52488A6B300CEC574 /* Localized.swift */; };
 		15780CD42488A7FF00CEC574 /* FontCase.h in Headers */ = {isa = PBXBuildFile; fileRef = 15780CD22488A7FF00CEC574 /* FontCase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -37,6 +39,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		150E5D002491DB65001E88F1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		150E5D052491DBC1001E88F1 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/SwiftUI.framework; sourceTree = DEVELOPER_DIR; };
 		15780CB92488A67800CEC574 /* Localization.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Localization.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		15780CBB2488A67800CEC574 /* Localization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Localization.h; sourceTree = "<group>"; };
 		15780CBC2488A67800CEC574 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -111,6 +115,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				150E5D062491DBC1001E88F1 /* SwiftUI.framework in Frameworks */,
+				150E5D022491DB76001E88F1 /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,6 +235,8 @@
 		15780D382488C97F00CEC574 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				150E5D052491DBC1001E88F1 /* SwiftUI.framework */,
+				150E5D002491DB65001E88F1 /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
