@@ -195,3 +195,25 @@ public extension RootCoordinator {
         return route().sink(receiveCompletion: { _ in }, receiveValue: { _ in })
     }
 }
+
+public final class PlainCoordinator<View: ViewComponent, ViewModel: ObservableObject>: Coordinator where View.ViewModel == ViewModel {
+    
+    init(view: View) {
+        self.view = view
+    }
+    
+    
+    let view: View
+    
+    public func makeViewModel() -> ViewModel {
+        view.viewModel
+    }
+    
+    public func makeView(viewModel: ViewModel) -> View {
+        view
+    }
+    
+    public func route(with viewModel: View.ViewModel) -> AnyPublisher<Void, Never> {
+        viewModel.willDismiss.eraseToAnyPublisher()
+    }
+}
