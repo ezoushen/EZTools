@@ -29,6 +29,11 @@ class HostingController<Content: View & ViewComponent>: UIHostingController<Cont
         super.viewDidLayoutSubviews()
         rootView.viewDidLayoutSubviews(view)
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        rootView.viewDidDisappear(view)
+    }
 }
 
 public protocol ViewHost { }
@@ -48,6 +53,8 @@ public protocol ViewComponent {
     
     func viewWillAppear(_ view: UIView)
     
+    func viewDidDisappear(_ view: UIView)
+    
     func viewDidLayoutSubviews(_ view: UIView)
     
     func viewWillLayoutSubviews(_ view: UIView)
@@ -61,6 +68,8 @@ public extension ViewComponent {
     func viewDidAppear(_ view: UIView) { }
     
     func viewWillAppear(_ view: UIView) { }
+    
+    func viewDidDisappear(_ view: UIView) { }
     
     func viewDidLayoutSubviews(_ view: UIView) { }
     

@@ -54,7 +54,7 @@ extension ViewModel where Self: ObservableObject {
     }
 }
 
-public final class EmptyViewModel: ViewModel {
+public final class EmptyViewModel: ViewModel, ObservableObject {
     public init() { }
 }
 

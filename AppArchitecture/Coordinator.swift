@@ -198,10 +198,9 @@ public extension RootCoordinator {
 
 public final class PlainCoordinator<View: ViewComponent, ViewModel: ObservableObject>: Coordinator where View.ViewModel == ViewModel {
     
-    init(view: View) {
+    public init(view: View) {
         self.view = view
     }
-    
     
     let view: View
     
