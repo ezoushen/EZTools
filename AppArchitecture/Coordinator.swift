@@ -99,6 +99,12 @@ extension Coordinator {
     }
     
     public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Never> where Controller == Coordinator.RootController {
+        guard !children.allObjects
+            .map({ String(describing: type(of: $0))})
+            .contains(String(describing: type(of: coordinator))) else {
+            return Empty<Coordinator.Result, Never>().eraseToAnyPublisher()
+        }
+        
         willCoordinate(to: coordinator)
         defer {
             didCoordinate(to: coordinator)
