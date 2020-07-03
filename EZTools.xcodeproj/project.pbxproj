@@ -36,6 +36,7 @@
 		15780D312488A8B200CEC574 /* DelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780D262488A8B200CEC574 /* DelegateProxy.swift */; };
 		15780D322488A8B200CEC574 /* UIControl+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780D292488A8B200CEC574 /* UIControl+Combine.swift */; };
 		15780D332488A8B200CEC574 /* Gesture+Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15780D242488A8B200CEC574 /* Gesture+Combine.swift */; };
+		15A8B0E024AF0D9300B2C20F /* Iterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A8B0DF24AF0D9300B2C20F /* Iterator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +81,7 @@
 		15780D292488A8B200CEC574 /* UIControl+Combine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+Combine.swift"; sourceTree = "<group>"; };
 		15780D2A2488A8B200CEC574 /* UITextView+Combine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Combine.swift"; sourceTree = "<group>"; };
 		15780D2B2488A8B200CEC574 /* Publishers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publishers.swift; sourceTree = "<group>"; };
+		15A8B0DF24AF0D9300B2C20F /* Iterator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Iterator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,6 +228,7 @@
 				15780D2A2488A8B200CEC574 /* UITextView+Combine.swift */,
 				15780D252488A8B200CEC574 /* UITextField+Combine.swift */,
 				15780D272488A8B200CEC574 /* NSObject+Combine.swift */,
+				15A8B0DF24AF0D9300B2C20F /* Iterator.swift */,
 				15780D1E2488A8A600CEC574 /* CombineCocoa.h */,
 				15780D1F2488A8A600CEC574 /* Info.plist */,
 			);
@@ -560,6 +563,7 @@
 				15780D302488A8B200CEC574 /* Publishers.swift in Sources */,
 				15780D322488A8B200CEC574 /* UIControl+Combine.swift in Sources */,
 				15780D2E2488A8B200CEC574 /* NSObject+Combine.swift in Sources */,
+				15A8B0E024AF0D9300B2C20F /* Iterator.swift in Sources */,
 				15780D312488A8B200CEC574 /* DelegateProxy.swift in Sources */,
 				15780D332488A8B200CEC574 /* Gesture+Combine.swift in Sources */,
 			);
