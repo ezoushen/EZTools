@@ -1,6 +1,7 @@
 // Iterator.swift
 
 import Combine
+import Foundation
 
 extension Publishers {
     public struct Iterator<Sequence: Swift.Sequence, Upstream: Publisher>: Publisher {

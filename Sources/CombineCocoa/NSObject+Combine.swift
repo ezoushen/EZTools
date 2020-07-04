@@ -1,6 +1,7 @@
 // NSObject+Combine.swift
 
 import Combine
+import Foundation
 
 public extension CBPublishers where Base: NSObject {
     func observe<T>(for key: String, type: T.Type, options: NSKeyValueObservingOptions = [.initial, .new]) -> KVOPublisher<Base, T> {

@@ -2,8 +2,7 @@
 //  SwiftUIPreview.h
 //  SwiftUIPreview
 //
-//  Created by 沈昱佐 on 2020/6/4.
-//  Copyright © 2020 ezoushen. All rights reserved.
+//  Created by 沈昱佐 on 2020/7/4.
 //
 
 #import <Foundation/Foundation.h>
