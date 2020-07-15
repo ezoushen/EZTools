@@ -182,7 +182,7 @@ public extension Coordinator where View == EmptyView {
 }
 
 public protocol RootCoordinator: Coordinator
-where Controller == UIWindow, RootController == UIWindow, View == EmptyView {
+where RootController == UIWindow, View == EmptyView {
     var window: UIWindow { get }
     func route() -> ResultPublisher
 }
