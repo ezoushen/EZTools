@@ -8,6 +8,8 @@ enum ViewModelKey {
     static var willDismiss:     UInt = 0x2
 }
 
+public typealias NavigationSubject<Data> = PassthroughSubject<Data, Never>
+
 public protocol ViewModel: AnyObject {
     var cancellables: Set<AnyCancellable>  { get set }
     var willDismiss: PassthroughSubject<Void, Never> { get }
