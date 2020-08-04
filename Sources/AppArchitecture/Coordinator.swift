@@ -21,6 +21,8 @@ public protocol Coordinator: Coordinatable {
     associatedtype RootController: ViewHost = UIViewController
     associatedtype ResultPublisher: Publisher = AnyPublisher<Result, Never> where ResultPublisher.Failure == Never, ResultPublisher.Output == Result
         
+    var cancellables: Set<AnyCancellable> { get set }
+    
     func makeViewModel() -> View.ViewModel
     func makeView(viewModel: View.ViewModel) -> View
     func makeController(from: UIViewController) -> Controller
@@ -47,6 +49,16 @@ public extension Coordinator {
 }
 
 extension Coordinator {
+    public var cancellables: Set<AnyCancellable> {
+        get {
+            fatalError("please provide your own dispose bag")
+        }
+        set {
+            guard !newValue.isEmpty else { return }
+            fatalError("please provide your own dispose bag")
+        }
+    }
+    
     var viewModel: View.ViewModel {
         guard let viewModel = objc_getAssociatedObject(self, &CoordinatorKey.viewModel) as? View.ViewModel else {
             let viewModel = makeViewModel()
@@ -96,6 +108,8 @@ extension Coordinator {
     
     func release<Coordinator: AppArchitecture.Coordinator>(_ coordinator: Coordinator) {
         children.remove(coordinator)
+        coordinator.viewModel.cancellables = []
+        coordinator.cancellables = []
     }
     
     public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Never> where Controller == Coordinator.RootController {
