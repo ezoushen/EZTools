@@ -133,6 +133,7 @@ extension Coordinator {
                 }
                 return value
             }
+            .first()
             .eraseToAnyPublisher()
     }
 }
