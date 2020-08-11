@@ -139,7 +139,7 @@ extension Coordinator {
                 if let coordinator = coordinator {
                     self?.willRelease(coordinator: coordinator)
                     defer {
-                        self?.willRelease(coordinator: coordinator)
+                        self?.didRelease(coordinator: coordinator)
                     }
                     
                     self?.release(coordinator)
@@ -161,12 +161,6 @@ public extension Coordinator where Controller == UIViewController {
 public extension Coordinator where Controller == UINavigationController {
     func makeController(from viewController: UIViewController) -> Controller {
         .init(rootViewController: viewController)
-    }
-}
-
-public extension Coordinator where Controller == UIWindow {
-    func makeController(from viewController: UIViewController) -> Controller {
-        UIWindow.rootWindow
     }
 }
 
@@ -202,6 +196,12 @@ where RootController == UIWindow, View == EmptyView {
     func route() -> ResultPublisher
 }
 
+public extension RootCoordinator where Controller == UIWindow {
+    func makeController(from viewController: UIViewController) -> Controller {
+        window
+    }
+}
+
 public extension RootCoordinator {
     func present(viewController: Controller, parentViewController: RootController) { }
     
@@ -212,7 +212,10 @@ public extension RootCoordinator {
     }
     
     func active() -> AnyCancellable {
-        UIWindow.rootWindow = window
+        if window.isKeyWindow {
+            UIWindow.rootWindow = window
+        }
+        
         return route().sink(receiveCompletion: { _ in }, receiveValue: { _ in })
     }
 }
