@@ -228,6 +228,11 @@ public final class PlainCoordinator<View: ViewComponent, ViewModel: ObservableOb
     
     let view: View
     
+    public func present(viewController: UIViewController, parentViewController: UIViewController) {
+        viewController.modalPresentationStyle = .overFullScreen
+        parentViewController.present(viewController, animated: false, completion: nil)
+    }
+    
     public func makeViewModel() -> ViewModel {
         view.viewModel
     }
