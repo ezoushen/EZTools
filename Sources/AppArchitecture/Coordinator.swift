@@ -245,3 +245,19 @@ public final class PlainCoordinator<View: ViewComponent, ViewModel: ObservableOb
         viewModel.willDismiss.eraseToAnyPublisher()
     }
 }
+
+open class ActionCoordinator: Coordinator {
+    
+    private let action: () -> Void
+    
+    public init(action: @escaping () -> Void) {
+        self.action = action
+    }
+    
+    public func route(with viewModel: EmptyViewModel) -> AnyPublisher<Void, Never> {
+        
+        action()
+        
+        return Just(()).eraseToAnyPublisher()
+    }
+}
