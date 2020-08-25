@@ -4,7 +4,7 @@ import UIKit
 import Foundation
 
 public extension Notification.Name {
-    static let didChangePrefferedLanguage: Notification.Name = .init("didChangePrefferedLanguage")
+    static let DidChangePrefferedLanguage: Notification.Name = .init("DidChangePrefferedLanguage")
 }
 
 @objc public protocol LanguageReloadable {
@@ -19,7 +19,7 @@ public protocol Localizable: NSObject, LanguageReloadable {
 
 public extension Localizable where Self: NSObject {
     func registerForLanguageChange(target: LanguageReloadable) {
-        NotificationCenter.default.addObserver(target, selector: #selector(target.reloadLanguage), name: .didChangePrefferedLanguage, object: nil)
+        NotificationCenter.default.addObserver(target, selector: #selector(target.reloadLanguage), name: .DidChangePrefferedLanguage, object: nil)
     }
 }
 
