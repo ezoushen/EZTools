@@ -77,7 +77,7 @@ extension Coordinator {
         return view
     }
     
-    var controller: Controller {
+    public var controller: Controller {
         guard let controller = objc_getAssociatedObject(self, &CoordinatorKey.controller) as? Controller else {
             let controller = makeController(from: view.asViewController())
             objc_setAssociatedObject(self, &CoordinatorKey.controller, controller, .OBJC_ASSOCIATION_RETAIN)
@@ -96,8 +96,11 @@ extension Coordinator {
     }
     
     func start(with parent: RootController) -> ResultPublisher {
+        let controller = self.controller
         
-        present(viewController: controller, parentViewController: parent)
+        defer {
+            present(viewController: controller, parentViewController: parent)
+        }
         
         return route(with: viewModel)
     }
