@@ -12,7 +12,7 @@ public extension Notification.Name {
 }
 
 public protocol Localizable: NSObject, LanguageReloadable {
-    var localizedKey: String { get set }
+    var localized: Localized? { get set }
     var isAutoFittingSize: Bool { get set }
     func registerForLanguageChange(target: LanguageReloadable)
 }
@@ -24,28 +24,39 @@ public extension Localizable where Self: NSObject {
 }
 
 @IBDesignable
-public class LocalizedLabel: UILabel, Localizable {
+open class LocalizedLabel: UILabel, Localizable {
+    
     @IBInspectable
-    public var localizedKey: String = "" {
+    public var localizedKey: String? = "" {
         didSet {
-            text = NSLocalizedString(localizedKey, comment: "")
-            guard isAutoFittingSize else { return }
-            sizeToFit()
+            if let key = localizedKey {
+                localized = Localized[dynamicMember: key]
+            } else {
+                localized = nil
+            }
+        }
+    }
+    
+    public var localized: Localized? = nil {
+        didSet {
+            reloadLanguage()
         }
     }
     
     public var isAutoFittingSize: Bool = true
     
     @objc public func reloadLanguage() {
-        localizedKey = String(localizedKey)
+        text = localized?.description
+        guard isAutoFittingSize else { return }
+        sizeToFit()
     }
     
-    override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
         registerForLanguageChange(target: self)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         registerForLanguageChange(target: self)
     }
@@ -56,29 +67,39 @@ public class LocalizedLabel: UILabel, Localizable {
 }
 
 @IBDesignable
-public class LocalizedButton: UIButton, Localizable {
+open class LocalizedButton: UIButton, Localizable {
     @IBInspectable
-    public var localizedKey: String = "" {
+    public var localizedKey: String? = "" {
         didSet {
-            let localizedString = NSLocalizedString(localizedKey, comment: "")
-            setTitle(localizedString, for: .normal)
-            guard isAutoFittingSize else { return }
-            sizeToFit()
+            if let key = localizedKey {
+                localized = Localized[dynamicMember: key]
+            } else {
+                localized = nil
+            }
+        }
+    }
+    
+    public var localized: Localized? = nil {
+        didSet {
+            reloadLanguage()
         }
     }
     
     public var isAutoFittingSize: Bool = true
     
     @objc public func reloadLanguage() {
-        localizedKey = String(localizedKey)
+        let localizedString = localized?.description
+        setTitle(localizedString, for: .normal)
+        guard isAutoFittingSize else { return }
+        sizeToFit()
     }
     
-    override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
         registerForLanguageChange(target: self)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         registerForLanguageChange(target: self)
     }
@@ -89,12 +110,21 @@ public class LocalizedButton: UIButton, Localizable {
 }
 
 @IBDesignable
-public class LocalizedTextField: UITextField, Localizable {
+open class LocalizedTextField: UITextField, Localizable {
     @IBInspectable
-    public var localizedKey: String = "" {
+    public var localizedKey: String? = "" {
         didSet {
-            let localizedString = NSLocalizedString(localizedKey, comment: "")
-            placeholder = localizedString
+            if let key = localizedKey {
+                localized = Localized[dynamicMember: key]
+            } else {
+                localized = nil
+            }
+        }
+    }
+    
+    public var localized: Localized? = nil {
+        didSet {
+            reloadLanguage()
         }
     }
     
@@ -104,7 +134,7 @@ public class LocalizedTextField: UITextField, Localizable {
     public var isAutoFittingSize: Bool = true
     
     @objc public func reloadLanguage() {
-        localizedKey = String(localizedKey)
+        placeholder = localized?.description
     }
     
     override init(frame: CGRect) {
@@ -112,7 +142,7 @@ public class LocalizedTextField: UITextField, Localizable {
         registerForLanguageChange(target: self)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         registerForLanguageChange(target: self)
     }
@@ -134,19 +164,28 @@ public class LocalizedTextField: UITextField, Localizable {
 }
 
 @IBDesignable
-public class LocalizedBarButtonItem: UIBarButtonItem, Localizable {
+open class LocalizedBarButtonItem: UIBarButtonItem, Localizable {
     @IBInspectable
-    public var localizedKey: String = "" {
+    public var localizedKey: String? = "" {
         didSet {
-            let localizedString = NSLocalizedString(localizedKey, comment: "")
-            title = localizedString
+            if let key = localizedKey {
+                localized = Localized[dynamicMember: key]
+            } else {
+                localized = nil
+            }
+        }
+    }
+    
+    public var localized: Localized? = nil {
+        didSet {
+            reloadLanguage()
         }
     }
     
     public var isAutoFittingSize: Bool = true
     
     @objc public func reloadLanguage() {
-        localizedKey = String(localizedKey)
+        title = localized?.description
     }
     
     override init() {
@@ -154,7 +193,7 @@ public class LocalizedBarButtonItem: UIBarButtonItem, Localizable {
         registerForLanguageChange(target: self)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         registerForLanguageChange(target: self)
     }
@@ -165,19 +204,28 @@ public class LocalizedBarButtonItem: UIBarButtonItem, Localizable {
 }
 
 @IBDesignable
-public class LocalizedNavigationItem: UINavigationItem, Localizable {
+open class LocalizedNavigationItem: UINavigationItem, Localizable {
     @IBInspectable
-    public var localizedKey: String = "" {
+    public var localizedKey: String? = "" {
         didSet {
-            let localizedString = NSLocalizedString(localizedKey, comment: "")
-            title = localizedString
+            if let key = localizedKey {
+                localized = Localized[dynamicMember: key]
+            } else {
+                localized = nil
+            }
+        }
+    }
+    
+    public var localized: Localized? = nil {
+        didSet {
+            reloadLanguage()
         }
     }
     
     public var isAutoFittingSize: Bool = true
     
     @objc public func reloadLanguage() {
-        localizedKey = String(localizedKey)
+        title = localized?.description
     }
     
     override init(title: String) {
@@ -185,7 +233,7 @@ public class LocalizedNavigationItem: UINavigationItem, Localizable {
         registerForLanguageChange(target: self)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         registerForLanguageChange(target: self)
     }
@@ -196,19 +244,28 @@ public class LocalizedNavigationItem: UINavigationItem, Localizable {
 }
 
 @IBDesignable
-public class LocalizedTextView: UITextView, Localizable {
+open class LocalizedTextView: UITextView, Localizable {
     @IBInspectable
-    public var localizedKey: String = "" {
+    public var localizedKey: String? = "" {
         didSet {
-            let localizedString = NSLocalizedString(localizedKey, comment: "")
-            text = localizedString
+            if let key = localizedKey {
+                localized = Localized[dynamicMember: key]
+            } else {
+                localized = nil
+            }
+        }
+    }
+    
+    public var localized: Localized? = nil {
+        didSet {
+            reloadLanguage()
         }
     }
     
     public var isAutoFittingSize: Bool = true
     
     @objc public func reloadLanguage() {
-        localizedKey = String(localizedKey)
+        text = localized?.description
     }
     
     override init(frame: CGRect, textContainer: NSTextContainer?) {
@@ -216,7 +273,7 @@ public class LocalizedTextView: UITextView, Localizable {
         registerForLanguageChange(target: self)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         registerForLanguageChange(target: self)
     }
@@ -225,3 +282,4 @@ public class LocalizedTextView: UITextView, Localizable {
         NotificationCenter.default.removeObserver(self)
     }
 }
+
