@@ -259,7 +259,7 @@ open class ActionCoordinator: Coordinator {
     
     public func present(viewController: UIViewController, parentViewController: UIViewController) { }
     
-    public func route(with viewModel: EmptyViewModel) -> AnyPublisher<Void, Never> {
+    open func route(with viewModel: EmptyViewModel) -> AnyPublisher<Void, Never> {
         
         action()
         
