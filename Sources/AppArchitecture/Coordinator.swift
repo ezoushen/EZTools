@@ -16,10 +16,11 @@ public protocol Coordinatable: AnyObject { }
 
 public protocol Coordinator: Coordinatable {
     associatedtype Result = Void
+    associatedtype Failure = Never
     associatedtype View: ViewComponent
     associatedtype Controller: ViewHost = UIViewController
     associatedtype RootController: ViewHost = UIViewController
-    associatedtype ResultPublisher: Publisher = AnyPublisher<Result, Never> where ResultPublisher.Failure == Never, ResultPublisher.Output == Result
+    associatedtype ResultPublisher: Publisher = AnyPublisher<Result, Failure> where ResultPublisher.Failure == Failure, ResultPublisher.Output == Result
         
     var cancellables: Set<AnyCancellable> { get set }
     
@@ -115,11 +116,11 @@ extension Coordinator {
         coordinator.cancellables = []
     }
     
-    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Never> where Controller == Coordinator.RootController {
+    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> where Controller == Coordinator.RootController {
         guard !children.allObjects
             .map({ String(describing: type(of: $0))})
             .contains(String(describing: type(of: coordinator))) else {
-            return Empty<Coordinator.Result, Never>().eraseToAnyPublisher()
+            return Empty<Coordinator.Result, Coordinator.Failure>().eraseToAnyPublisher()
         }
         
         willCoordinate(to: coordinator)
