@@ -9,7 +9,7 @@ public class AnyLayout {
 }
 
 @propertyWrapper
-public class Layout<T: NSObject>: AnyLayout {
+public class Layout<T>: AnyLayout {
     public var wrappedValue: T {
         guard let keyPath = keyPath,
             let view = manager[keyPath: keyPath] as? T else {
