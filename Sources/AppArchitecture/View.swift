@@ -132,9 +132,11 @@ extension UIWindow: ViewHost {
 extension UIViewController: ViewHost { }
 
 extension UIViewController {
-    public func attachChild(_ viewController: UIViewController) {
+    public func attachChild(_ viewController: UIViewController, in viewport: UIView? = nil) {
+        let view: UIView = viewport ?? self.view
+        
         addChild(viewController)
-        viewController.view.frame = view.frame
+        viewController.view.frame.size = view.frame.size
         view.addSubview(viewController.view)
         viewController.didMove(toParent: self)
     }
