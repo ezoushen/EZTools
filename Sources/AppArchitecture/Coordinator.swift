@@ -69,7 +69,7 @@ extension Coordinator {
         return viewModel
     }
     
-    var view: View {
+    public var view: View {
         guard let view = objc_getAssociatedObject(self, &CoordinatorKey.view) as? View else {
             let view = makeView(viewModel: viewModel)
             objc_setAssociatedObject(self, &CoordinatorKey.view, view, .OBJC_ASSOCIATION_RETAIN)

@@ -36,7 +36,7 @@ class HostingController<Content: View & ViewComponent>: UIHostingController<Cont
     }
 }
 
-public protocol ViewHost { }
+public protocol ViewHost: AnyObject { }
 
 public protocol ViewComponent {
     associatedtype ViewModel: AppArchitecture.ViewModel = EmptyViewModel
