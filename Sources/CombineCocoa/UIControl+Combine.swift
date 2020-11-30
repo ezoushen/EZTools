@@ -9,7 +9,7 @@ public struct UIControlPublisher<Control: UIControl>: Publisher {
     
     public typealias Failure = Never
     
-    let control: Control
+    weak var control: Control?
     
     let controlEvent: UIControl.Event
     
@@ -24,15 +24,15 @@ public struct UIControlPublisher<Control: UIControl>: Publisher {
 }
 
 public final class UIControlSubscription<SubscribeType: Subscriber, Control: UIControl>: Subscription where SubscribeType.Input == Control {
+    weak var control: Control?
     var subscriber: SubscribeType?
-    let control: Control
     let event: UIControl.Event
     
-    init(subscriber: SubscribeType, control: Control, event: UIControl.Event) {
+    init(subscriber: SubscribeType, control: Control?, event: UIControl.Event) {
         self.subscriber = subscriber
         self.control = control
         self.event = event
-        self.control.addTarget(self, action: #selector(eventAction), for: event)
+        self.control?.addTarget(self, action: #selector(eventAction), for: event)
     }
     
     public func request(_ demand: Subscribers.Demand) { }
@@ -43,6 +43,7 @@ public final class UIControlSubscription<SubscribeType: Subscriber, Control: UIC
     
     @objc
     private func eventAction() {
+        guard let control = control else { return }
         _ = subscriber?.receive(control)
     }
 }
