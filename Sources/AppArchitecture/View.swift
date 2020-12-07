@@ -93,6 +93,7 @@ extension ViewComponent where Self: View {
         let hostingController = HostingController(rootView: self)
         hostingController.view.backgroundColor = .clear
         viewController.attachChild(hostingController)
+        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return viewController
     }
 }
