@@ -92,6 +92,7 @@ extension ViewComponent where Self: View {
         viewController.view.backgroundColor = .clear
         let hostingController = HostingController(rootView: self)
         hostingController.view.backgroundColor = .clear
+        hostingController.view.clipsToBounds = true
         viewController.attachChild(hostingController)
         hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return viewController
