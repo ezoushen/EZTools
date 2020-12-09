@@ -134,7 +134,7 @@ extension UIWindow: ViewHost {
 extension UIViewController: ViewHost { }
 
 extension UIViewController {
-    public func attachChild(_ viewController: UIViewController, in viewport: UIView? = nil) {
+    @objc open func attachChild(_ viewController: UIViewController, in viewport: UIView? = nil) {
         let view: UIView = viewport ?? self.view
         
         addChild(viewController)
@@ -143,7 +143,7 @@ extension UIViewController {
         viewController.didMove(toParent: self)
     }
     
-    public func detachFromParent() {
+    @objc open func detachFromParent() {
         willMove(toParent: nil)
         view.removeFromSuperview()
         removeFromParent()
