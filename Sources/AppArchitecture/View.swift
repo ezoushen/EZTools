@@ -86,16 +86,36 @@ public final class EmptyView: UIViewController, ViewComponent {
     public typealias ViewModel = EmptyViewModel
 }
 
-extension ViewComponent where Self: View {
-    public func asViewController() -> UIViewController {
-        let viewController = UIViewController()
-        viewController.view.backgroundColor = .clear
-        let hostingController = HostingController(rootView: self)
+fileprivate class ViewController<View: ViewComponent & SwiftUI.View>: UIViewController {
+    let hostingController: HostingController<View>
+    
+    init(_ hostingController: HostingController<View>) {
         hostingController.view.backgroundColor = .clear
         hostingController.view.clipsToBounds = true
-        viewController.attachChild(hostingController)
-        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        return viewController
+        
+        self.hostingController = hostingController
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        view.backgroundColor = .clear
+        attachChild(hostingController)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        hostingController.view.sizeToFit()
+        view.frame.size = hostingController.view.frame.size
+    }
+}
+
+extension ViewComponent where Self: View {
+    public func asViewController() -> UIViewController {
+        let hostingController = HostingController(rootView: self)
+        return ViewController(hostingController)
     }
 }
 
