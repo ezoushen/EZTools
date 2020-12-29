@@ -168,6 +168,16 @@ public extension Coordinator where Controller == UINavigationController {
     }
 }
 
+public extension Coordinator where RootController: UINavigationController, Controller: UIViewController {
+    func present(viewController: Controller, parentViewController: RootController) {
+        parentViewController.pushViewController(viewController, animated: true)
+    }
+    
+    func dismiss(viewController: Controller) {
+        viewController.navigationController?.popViewController(animated: true)
+    }
+}
+
 public extension Coordinator where RootController: UIViewController, Controller: UIViewController {
     func present(viewController: Controller, parentViewController: RootController) {
         parentViewController.present(viewController, animated: true, completion: nil)
@@ -175,12 +185,6 @@ public extension Coordinator where RootController: UIViewController, Controller:
     
     func dismiss(viewController: Controller) {
         viewController.dismiss(animated: true, completion: nil)
-    }
-}
-
-public extension Coordinator where RootController: UINavigationController, Controller: UIViewController {
-    func present(viewController: Controller, parentViewController: RootController) {
-        parentViewController.pushViewController(viewController, animated: true)
     }
 }
 
