@@ -60,7 +60,7 @@ extension Coordinator {
         }
     }
     
-    var viewModel: View.ViewModel {
+    public var viewModel: View.ViewModel {
         guard let viewModel = objc_getAssociatedObject(self, &CoordinatorKey.viewModel) as? View.ViewModel else {
             let viewModel = makeViewModel()
             objc_setAssociatedObject(self, &CoordinatorKey.viewModel, viewModel, .OBJC_ASSOCIATION_RETAIN)
@@ -152,6 +152,7 @@ extension Coordinator {
                 return value
             }
             .first()
+            .print(String(describing: Self.self))
             .eraseToAnyPublisher()
     }
 }
