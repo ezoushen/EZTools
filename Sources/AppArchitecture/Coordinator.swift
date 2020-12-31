@@ -152,7 +152,6 @@ extension Coordinator {
                 return value
             }
             .first()
-            .print(String(describing: Self.self))
             .eraseToAnyPublisher()
     }
 }
