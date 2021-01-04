@@ -13,6 +13,8 @@ public typealias NavigationSubject<Data> = PassthroughSubject<Data, Never>
 public protocol ViewModel: AnyObject {
     var cancellables: Set<AnyCancellable>  { get set }
     var willDismiss: PassthroughSubject<Void, Never> { get }
+    
+    func dismiss()
 }
 
 extension ViewModel {
@@ -39,6 +41,10 @@ extension ViewModel {
             return willDismiss
         }
         return willDismiss
+    }
+    
+    public func dismiss() {
+        willDismiss.send()
     }
 }
 
