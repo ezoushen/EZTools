@@ -97,12 +97,7 @@ extension Coordinator {
     }
     
     func start(with parent: RootController) -> ResultPublisher {
-        let controller = self.controller
-        
-        defer {
-            present(viewController: controller, parentViewController: parent)
-        }
-        
+        present(viewController: controller, parentViewController: parent)
         return route(with: viewModel)
     }
     
