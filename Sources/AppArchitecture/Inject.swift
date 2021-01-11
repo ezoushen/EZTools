@@ -29,7 +29,7 @@ extension Injectee where Self: View {
 
 extension Injectee where Self: NSObject {
     @discardableResult
-    public func inject<T: ObservableObject>(_ value: T) -> Self {
+    public func inject<T>(_ value: T) -> Self {
         children(of: Mirror(reflecting: self), recursive: true)
             .forEach { (_, val) in
                 if let injecter = val as? Inject<T> {
