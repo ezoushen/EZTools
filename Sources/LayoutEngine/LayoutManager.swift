@@ -21,18 +21,5 @@ extension Layouter where Self: KeyPathListable {
     public init<L: Layoutee>(host: L, viewport: UIView) {
         self.init()
         view = viewport
-        exposeViews(to: host)
-    }
-    
-    public func exposeViews<L: Layoutee>(to host: L) {
-        let keyPaths = allKeyPaths
-        
-        Mirror(reflecting: host).children.forEach {
-            guard let layout = $0.value as? AnyLayout,
-                  let substring = $0.label?.dropFirst() else { return }
-            layout.anyManager = self
-            layout.name = String(substring)
-            layout.keyPath = layout.keyPath ?? keyPaths[layout.name]
-        }
     }
 }
