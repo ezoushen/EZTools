@@ -21,8 +21,6 @@ public class Layout<T>: AnyLayout {
         return view
     }
     
-    public override init() { }
-    
     public init<L: LayoutManager>(_ keyPath: KeyPath<L, T>) {
         super.init()
         self.keyPath = keyPath
