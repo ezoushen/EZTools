@@ -49,14 +49,6 @@ extension ViewModel {
 }
 
 extension ViewModel where Self: ObservableObject {
-    public func bindSubmodel() {
-        children(of: Mirror(reflecting: self), recursive: true)
-            .forEach { lable, value in
-                guard var value = value as? SubmodelProtocol else { return }
-                value.bind(to: self)
-            }
-    }
-    
     public var bindings: Bindable<Self> {
         .init(self)
     }
@@ -89,13 +81,4 @@ extension Bindable where T: AnyObject {
             set: { [unowned value = self.value] in value[keyPath: keyPath] = $0 }
         )
     }
-}
-
-func children(of mirror: Mirror, recursive: Bool) -> [Mirror.Child] {
-    guard recursive else { return Array(mirror.children) }
-    func findChildren(mirror: Mirror?) -> [Mirror.Child] {
-        guard let mirror = mirror else { return [] }
-        return mirror.children + findChildren(mirror: mirror.superclassMirror)
-    }
-    return findChildren(mirror: mirror)
 }
