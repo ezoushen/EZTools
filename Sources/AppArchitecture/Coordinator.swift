@@ -60,7 +60,7 @@ extension Coordinatable {
     }
 }
 extension Coordinatable {
-    func find<C: Coordinatable>(_ type: C.Type) -> C? {
+    public func find<C: Coordinatable>(_ type: C.Type) -> C? {
         if self is C { return self as? C }
         
         for child in children.allObjects {
@@ -71,7 +71,7 @@ extension Coordinatable {
         return nil
     }
     
-    func findAll<C: Coordinatable>(_ type: C.Type) -> [C] {
+    public func findAll<C: Coordinatable>(_ type: C.Type) -> [C] {
         if self is C { return [self as! C] }
         
         return children.allObjects.flatMap {
