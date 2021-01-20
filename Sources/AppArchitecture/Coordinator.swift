@@ -49,6 +49,38 @@ public extension Coordinator {
     func didRelease<Child: Coordinator>(coordinator: Child) { }
 }
 
+extension Coordinatable {
+    public var children: NSHashTable<Coordinatable> {
+        guard let table = objc_getAssociatedObject(self, &CoordinatorKey.children) as? NSHashTable<Coordinatable> else {
+            let table = NSHashTable<Coordinatable>()
+            objc_setAssociatedObject(self, &CoordinatorKey.children, table, .OBJC_ASSOCIATION_RETAIN)
+            return table
+        }
+        return table
+    }
+}
+extension Coordinatable {
+    func find<C: Coordinatable>(_ type: C.Type) -> C? {
+        if self is C { return self as? C }
+        
+        for child in children.allObjects {
+            guard let coordinator = child.find(type) else { continue }
+            return coordinator
+        }
+        
+        return nil
+    }
+    
+    func findAll<C: Coordinatable>(_ type: C.Type) -> [C] {
+        if self is C { return [self as! C] }
+        
+        return children.allObjects.flatMap {
+            $0.findAll(type)
+        }
+    }
+}
+
+
 extension Coordinator {
     public var cancellables: Set<AnyCancellable> {
         get {
@@ -85,15 +117,6 @@ extension Coordinator {
             return controller
         }
         return controller
-    }
-    
-    public var children: NSHashTable<Coordinatable> {
-        guard let table = objc_getAssociatedObject(self, &CoordinatorKey.children) as? NSHashTable<Coordinatable> else {
-            let table = NSHashTable<Coordinatable>()
-            objc_setAssociatedObject(self, &CoordinatorKey.children, table, .OBJC_ASSOCIATION_RETAIN)
-            return table
-        }
-        return table
     }
     
     func start(with parent: RootController) -> ResultPublisher {
