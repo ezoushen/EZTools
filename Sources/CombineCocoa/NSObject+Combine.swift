@@ -13,8 +13,9 @@ public extension CBPublishers where Base: NSObject {
     }
 }
 
-public struct KVOPublisher<Object: NSObject, Output>: Publisher {
+public struct KVOPublisher<Object: NSObject, Observed>: Publisher {
     
+    public typealias Output = Observed?
     public typealias Failure = Never
     
     public let subject: Object
@@ -22,13 +23,15 @@ public struct KVOPublisher<Object: NSObject, Output>: Publisher {
     public let options: NSKeyValueObservingOptions
     
     public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
-        let subscription = KVOSubscription(subject: subject, subscriber: subscriber, keyPath: keyPath, options: options)
+        let subscription = KVOSubscription<S, Observed>(subject: subject, subscriber: subscriber, keyPath: keyPath, options: options)
         subscriber.receive(subscription: subscription)
         subscription.subscribe()
     }
 }
 
-public class KVOSubscription<SubscribeType: Subscriber, Output>: NSObject, Subscription where SubscribeType.Input == Output {
+public class KVOSubscription<SubscribeType: Subscriber, Observed>: NSObject, Subscription where SubscribeType.Input == Observed? {
+    public typealias Output = Observed?
+    
     private var context: Int = 0
     private let keyPath: String
     private let options: NSKeyValueObservingOptions
@@ -45,9 +48,8 @@ public class KVOSubscription<SubscribeType: Subscriber, Output>: NSObject, Subsc
     }
     
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard self.keyPath == keyPath,
-            let value = change?[.newKey] as? Output else { return }
-        _ = subscriber?.receive(value)
+        guard self.keyPath == keyPath else { return }
+        _ = subscriber?.receive(change?[.newKey] as? Observed)
     }
     
     func subscribe() {
@@ -57,8 +59,10 @@ public class KVOSubscription<SubscribeType: Subscriber, Output>: NSObject, Subsc
     public func request(_ demand: Subscribers.Demand) { }
     
     public func cancel() {
-        subject?.removeObserver(self, forKeyPath: keyPath)
-        subject = nil
-        subscriber = nil
+        DispatchQueue.main.async {
+            self.subject?.removeObserver(self, forKeyPath: self.keyPath)
+            self.subject = nil
+            self.subscriber = nil
+        }
     }
 }
