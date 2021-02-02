@@ -4,9 +4,9 @@ import Foundation
 import SwiftUI
 
 @propertyWrapper
-public class Inject<Value>: ObservableObject {
+public class Inject<Value: AnyObject>: ObservableObject {
         
-    fileprivate var _value: Value?
+    fileprivate weak var _value: Value?
     
     public var wrappedValue: Value {
         fatalError("Do not access wrappedValue directly")
@@ -65,7 +65,7 @@ fileprivate class InjectContainer {
 
 extension Injectee where Self: AnyObject {
     @discardableResult
-    public func inject<T>(_ value: T) -> Self {
+    public func inject<T: AnyObject>(_ value: T) -> Self {
         injectContainer.register(T.self, value: value)
         return self
     }
