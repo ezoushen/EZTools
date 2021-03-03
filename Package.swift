@@ -28,6 +28,12 @@ let package = Package(
         .library(
             name: "AppArchitecture",
             targets: ["AppArchitecture"]),
+        .library(name: "EZTools", targets: [
+            "FontCase",
+            "CombineCocoa",
+            "LayoutEngine",
+            "Localization",
+            "AppArchitecture"])
         
     ],
     dependencies: [
