@@ -178,7 +178,7 @@ public extension GestureType {
 }
 
 public final class GestureSubscription<S: Subscriber, G: Gesture>: NSObject, Subscription, UIGestureRecognizerDelegate where S.Input == G, S.Failure == Never {
-    private var subscriber: S?
+    private var subscriber: S
     private var gesture: G
         
     private weak var view: UIView?
@@ -207,14 +207,12 @@ public final class GestureSubscription<S: Subscriber, G: Gesture>: NSObject, Sub
         gesture.recognizer.removeTarget(self, action: #selector(handler))
         view?.removeGestureRecognizer(gesture.recognizer)
         view = nil
-        subscriber = nil
     }
     
     @objc
     private func handler() {
-        _ = subscriber?.receive(gesture)
+        _ = subscriber.receive(gesture)
     }
-    
 }
 
 public protocol GestureRecognizerDelegate: AnyObject {
