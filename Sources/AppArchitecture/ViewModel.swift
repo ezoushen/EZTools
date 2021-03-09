@@ -96,6 +96,10 @@ public final class Relay<S: Subject>: Subject {
         self.subject = subject
     }
     
+    public var projectedValue: AnySubscriber<Output, Failure> {
+        AnySubscriber(subject)
+    }
+    
     public var wrappedValue: AnyPublisher<Output, Failure> {
         subject.eraseToAnyPublisher()
     }
