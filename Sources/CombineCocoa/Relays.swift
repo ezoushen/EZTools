@@ -1,8 +1,18 @@
-// Relay.swift
+// Relays.swift
 
 import Combine
 
-public final class PassthroughRelay<T, E: Error>: Publisher, Subscriber {
+public protocol Relay:
+    Publisher,
+    Subscriber
+where
+    Input == Output { }
+
+public protocol ValueRelay: Relay {
+    var currentValue: Output { get }
+}
+
+public final class PassthroughRelay<T, E: Error>: Relay {
     
     public typealias Output = T
     
@@ -11,6 +21,8 @@ public final class PassthroughRelay<T, E: Error>: Publisher, Subscriber {
     public typealias Input = T
     
     private let subject: PassthroughSubject<T, E> = .init()
+    
+    public init() { }
     
     public func receive<S>(subscriber: S)
     where S : Subscriber, Failure == S.Failure, Output == S.Input {
@@ -31,7 +43,7 @@ public final class PassthroughRelay<T, E: Error>: Publisher, Subscriber {
     }
 }
 
-public final class CurrentValueRelay<T, E: Error>: Publisher, Subscriber {
+public final class CurrentValueRelay<T, E: Error>: ValueRelay {
     
     public typealias Output = T
     
@@ -40,6 +52,10 @@ public final class CurrentValueRelay<T, E: Error>: Publisher, Subscriber {
     public typealias Input = T
     
     private let subject: CurrentValueSubject<T, E>
+    
+    public var currentValue: T {
+        subject.value
+    }
     
     init(_ value: T) {
         subject = .init(value)
