@@ -20,7 +20,7 @@ public struct Localized {
     public subscript(dynamicMember key: String) -> String {
         Localized(key: key, args: args, tableName: tableName, comment: comment).description
     }
-    
+
     let tableName: String?
     let bundle: Bundle
     let comment: String?
@@ -46,17 +46,22 @@ public struct Localized {
     public func dynamicallyCall(withKeywordArguments pairs: KeyValuePairs<String, CVarArg>) -> String {
         Localized(key: key, args: pairs.map{ $0.value }, tableName: tableName, comment: comment).description
     }
+
+    public var string: String {
+        let format = NSLocalizedString(key, tableName: tableName, comment: comment ?? "")
+        return String(format: format, arguments: args)
+    }
 }
 
 extension Localized: Equatable {
     public static func == (lhs: Localized, rhs: Localized) -> Bool {
-        lhs.description == rhs.description
+        lhs.key == rhs.key
     }
 }
 
 extension Localized: CustomStringConvertible {
     public var description: String {
-        String(format: NSLocalizedString(key, tableName: tableName, comment: comment ?? ""), arguments: args)
+        string
     }
 }
 
