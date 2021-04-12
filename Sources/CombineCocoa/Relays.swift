@@ -20,7 +20,7 @@ public final class PassthroughRelay<T, E: Error>: Relay {
     
     public typealias Input = T
     
-    private let subject: PassthroughSubject<T, E> = .init()
+    fileprivate let subject: PassthroughSubject<T, E> = .init()
     
     public init() { }
     
@@ -51,7 +51,7 @@ public final class CurrentValueRelay<T, E: Error>: ValueRelay {
     
     public typealias Input = T
     
-    private let subject: CurrentValueSubject<T, E>
+    fileprivate let subject: CurrentValueSubject<T, E>
     
     public var currentValue: T {
         subject.value
@@ -77,5 +77,19 @@ public final class CurrentValueRelay<T, E: Error>: ValueRelay {
     public func receive(_ input: T) -> Subscribers.Demand {
         subject.send(input)
         return .unlimited
+    }
+}
+
+extension Publisher {
+    public func subscribe<R: CombineCocoa.Relay>(_ relay: R) -> AnyCancellable
+    where
+        Failure == R.Failure,
+        Output == R.Input
+    {
+        sink {
+            relay.receive(completion: $0)
+        } receiveValue: {
+            _ = relay.receive($0)
+        }
     }
 }
