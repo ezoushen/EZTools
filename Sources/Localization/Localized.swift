@@ -44,7 +44,7 @@ public struct Localized {
     }
     
     public func dynamicallyCall(withKeywordArguments pairs: KeyValuePairs<String, CVarArg>) -> String {
-        Localized(key: key, args: pairs.map{ $0.value }, tableName: tableName, comment: comment).description
+        Localized(key: key, args: pairs.map{ $0.value }, tableName: tableName, comment: comment).string
     }
 
     public var string: String {
