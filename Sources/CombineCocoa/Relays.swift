@@ -57,7 +57,7 @@ public final class CurrentValueRelay<T, E: Error>: ValueRelay {
         subject.value
     }
     
-    init(_ value: T) {
+    public init(_ value: T) {
         subject = .init(value)
     }
     
