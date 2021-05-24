@@ -37,7 +37,7 @@ public class KVOSubscription<SubscribeType: Subscriber, Observed>: NSObject, Sub
     private let options: NSKeyValueObservingOptions
     private var subscriber: SubscribeType?
     private var subject: NSObject?
-    
+    private var isSubcribed: Bool = false
     init(subject: NSObject, subscriber: SubscribeType, keyPath: String, options: NSKeyValueObservingOptions) {
         self.subscriber = subscriber
         self.keyPath = keyPath
@@ -54,13 +54,16 @@ public class KVOSubscription<SubscribeType: Subscriber, Observed>: NSObject, Sub
     
     func subscribe() {
         subject?.addObserver(self, forKeyPath: keyPath, options: options, context: &context)
+        isSubcribed = true
     }
     
     public func request(_ demand: Subscribers.Demand) { }
     
     public func cancel() {
         DispatchQueue.main.async {
-            self.subject?.removeObserver(self, forKeyPath: self.keyPath)
+            if self.isSubcribed {
+                self.subject?.removeObserver(self, forKeyPath: self.keyPath)
+            }
             self.subject = nil
             self.subscriber = nil
         }
