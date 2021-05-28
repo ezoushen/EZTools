@@ -33,8 +33,11 @@ extension Publishers {
             }
 
             private let operationQueue: OperationQueue
+            private let sequence: Sequence
+            private let returnOnError: Bool
+            private let action: (Sequence.Element) -> Upstream
 
-            init(_ sequence: Sequence, concurrently size: Int?, returnOnErorr: Bool, action: @escaping ((Sequence.Element) -> Upstream), subscriber subject: Subscriber) {
+            init(_ sequence: Sequence, concurrently size: Int?, returnOnError: Bool, action: @escaping ((Sequence.Element) -> Upstream), subscriber subject: Subscriber) {
 
                 assert(size != nil && size! > 0, "concurrently count should always never equal to 0")
 
@@ -43,17 +46,24 @@ extension Publishers {
                 operationQueue = OperationQueue()
                 operationQueue.maxConcurrentOperationCount = size ?? 1
 
+                self.sequence = sequence
+                self.action = action
+                self.returnOnError = returnOnError
+            }
+
+            func fire() {
                 var it = sequence.makeIterator()
 
                 while let object = it.next() {
                     operationQueue.addOperation { [weak self] in
+                        guard let `self` = self else { return }
                         let group = DispatchGroup()
                         group.enter()
-                        let cancellable = action(object)
+                        let cancellable = self.action(object)
                             .sink { [weak self] completion in
                                 guard case .failure = completion,
-                                      returnOnErorr,
-                                      let `self` = self else { return }
+                                      let `self` = self,
+                                      self.returnOnError else { return }
                                 self.subscriber?.receive(completion: completion)
                             } receiveValue: { [weak self] value in
                                 guard let `self` = self else { return }
@@ -61,14 +71,15 @@ extension Publishers {
                                 group.leave()
                             }
 
-                        guard let `self` = self else { return }
                         self.cancellables.insert(cancellable)
 
                         group.wait()
                     }
                 }
                 DispatchQueue.global().async {
-                    self.operationQueue.waitUntilAllOperationsAreFinished()
+                    if self.operationQueue.isSuspended == false {
+                        self.operationQueue.waitUntilAllOperationsAreFinished()
+                    }
                     _ = self.subscriber?.receive(self.values)
                     self.subscriber?.receive(completion: .finished)
                 }
@@ -95,8 +106,9 @@ extension Publishers {
         }
 
         public func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
-            let subscription = Subscription(sequence, concurrently: concurrentlyCount, returnOnErorr: returnOnError, action: generator, subscriber: subscriber)
+            let subscription = Subscription(sequence, concurrently: concurrentlyCount, returnOnError: returnOnError, action: generator, subscriber: subscriber)
             subscriber.receive(subscription: subscription)
+            subscription.fire()
         }
     }
 }
