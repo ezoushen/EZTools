@@ -58,21 +58,32 @@ extension Publishers {
                     operationQueue.addOperation { [weak self] in
                         guard let `self` = self, cancelled == false else { return }
                         let group = DispatchGroup()
+                        var leaved = false
+
+                        func leaveGroupSafely() {
+                            guard leaved == false else { return }
+                            group.leave()
+                            leaved = true
+                        }
+
                         group.enter()
-                        _ = self.action(object)
+                        let cancellable = self.action(object)
+                            .handleEvents(receiveCancel: {
+                                leaveGroupSafely()
+                            })
                             .sink { [weak self] completion in
-                                defer {
-                                    group.leave()
-                                }
                                 guard case .failure = completion,
                                       let `self` = self,
-                                      self.returnOnError else { return }
+                                      self.returnOnError else { return leaveGroupSafely() }
                                 cancelled = true
                                 self.subscriber?.receive(completion: completion)
+                                leaveGroupSafely()
                             } receiveValue: { [weak self] value in
                                 guard let `self` = self else { return }
                                 self.values.append(value)
+                                leaveGroupSafely()
                             }
+                        self.cancellables.insert(cancellable)
                         group.wait()
                     }
                 }
