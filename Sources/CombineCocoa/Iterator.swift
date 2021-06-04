@@ -53,26 +53,26 @@ extension Publishers {
 
             func fire() {
                 var it = sequence.makeIterator()
-
+                var cancelled = false
                 while let object = it.next() {
                     operationQueue.addOperation { [weak self] in
-                        guard let `self` = self else { return }
+                        guard let `self` = self, cancelled == false else { return }
                         let group = DispatchGroup()
                         group.enter()
-                        let cancellable = self.action(object)
+                        _ = self.action(object)
                             .sink { [weak self] completion in
+                                defer {
+                                    group.leave()
+                                }
                                 guard case .failure = completion,
                                       let `self` = self,
                                       self.returnOnError else { return }
+                                cancelled = true
                                 self.subscriber?.receive(completion: completion)
                             } receiveValue: { [weak self] value in
                                 guard let `self` = self else { return }
                                 self.values.append(value)
-                                group.leave()
                             }
-
-                        self.cancellables.insert(cancellable)
-
                         group.wait()
                     }
                 }
@@ -80,6 +80,7 @@ extension Publishers {
                     if self.operationQueue.isSuspended == false {
                         self.operationQueue.waitUntilAllOperationsAreFinished()
                     }
+                    guard cancelled == false else { return }
                     _ = self.subscriber?.receive(self.values)
                     self.subscriber?.receive(completion: .finished)
                 }
