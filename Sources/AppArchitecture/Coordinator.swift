@@ -11,8 +11,9 @@ enum CoordinatorKey {
     static var controller:  UInt = 0x4
 }
 
-@objc
-public protocol Coordinatable: AnyObject { }
+public protocol Coordinatable: AnyObject {
+    func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Coordinator.Failure>
+}
 
 public protocol Coordinator: Coordinatable {
     associatedtype Result = Void
@@ -50,9 +51,9 @@ public extension Coordinator {
 }
 
 extension Coordinatable {
-    public var children: NSHashTable<Coordinatable> {
-        guard let table = objc_getAssociatedObject(self, &CoordinatorKey.children) as? NSHashTable<Coordinatable> else {
-            let table = NSHashTable<Coordinatable>()
+    public var children: NSHashTable<AnyObject> {
+        guard let table = objc_getAssociatedObject(self, &CoordinatorKey.children) as? NSHashTable<AnyObject> else {
+            let table = NSHashTable<AnyObject>()
             objc_setAssociatedObject(self, &CoordinatorKey.children, table, .OBJC_ASSOCIATION_RETAIN)
             return table
         }
@@ -63,7 +64,7 @@ extension Coordinatable {
     public func find<C: Coordinatable>(_ type: C.Type) -> C? {
         if self is C { return self as? C }
         
-        for child in children.allObjects {
+        for child in (children.allObjects as! [Coordinatable]) {
             guard let coordinator = child.find(type) else { continue }
             return coordinator
         }
@@ -74,7 +75,7 @@ extension Coordinatable {
     public func findAll<C: Coordinatable>(_ type: C.Type) -> [C] {
         if self is C { return [self as! C] }
         
-        return children.allObjects.flatMap {
+        return (children.allObjects as! [Coordinatable]).flatMap {
             $0.findAll(type)
         }
     }
@@ -134,7 +135,7 @@ extension Coordinator {
         coordinator.cancellables = []
     }
     
-    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> where Controller == Coordinator.RootController {
+    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> {
         guard !children.allObjects
             .map({ String(describing: type(of: $0))})
             .contains(String(describing: type(of: coordinator))) else {
@@ -149,6 +150,10 @@ extension Coordinator {
         store(coordinator)
         
         Coordinator.View.setupAppearance()
+
+        guard let controller = controller as? Coordinator.RootController else {
+            fatalError("Wrong root controller type")
+        }
         
         return coordinator.start(with: controller)
             .map { [weak coordinator] value -> Coordinator.Result in
