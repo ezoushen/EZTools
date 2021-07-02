@@ -49,6 +49,7 @@ public struct Localized {
 
     public var string: String {
         let format = NSLocalizedString(key, tableName: tableName, comment: comment ?? "")
+        guard args.isEmpty == false else { return format }
         return String(format: format, arguments: args)
     }
 }
