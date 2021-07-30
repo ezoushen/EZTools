@@ -28,7 +28,7 @@ let package = Package(
         .library(
             name: "AppArchitecture",
             targets: ["AppArchitecture"]),
-        .library(name: "EZTools", targets: [
+        .library(name: "EZTools", type: .dynamic, targets: [
             "FontCase",
             "CombineCocoa",
             "LayoutEngine",
