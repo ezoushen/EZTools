@@ -115,7 +115,7 @@ fileprivate class ViewController<View: ViewComponent & SwiftUI.View>: UIViewCont
 extension ViewComponent where Self: View {
     public func asViewController() -> UIViewController {
         let hostingController = HostingController(rootView: self)
-        hostingController.disableSafeArea()
+        hostingController.disableKeyboardAvoidance()
         return ViewController(hostingController)
     }
 }
@@ -174,15 +174,7 @@ extension UIViewController {
 extension UIViewController: UIAdaptivePresentationControllerDelegate { }
 
 extension UIHostingController {
-    convenience public init(rootView: Content, ignoreSafeArea: Bool) {
-        self.init(rootView: rootView)
-
-        if ignoreSafeArea {
-            disableSafeArea()
-        }
-    }
-
-    func disableSafeArea() {
+    func disableKeyboardAvoidance() {
         guard let viewClass = object_getClass(view) else { return }
 
         let viewSubclassName = String(cString: class_getName(viewClass)).appending("_IgnoreSafeArea")
@@ -194,8 +186,11 @@ extension UIHostingController {
             guard let viewSubclass = objc_allocateClassPair(viewClass, viewClassNameUtf8, 0) else { return }
 
             if let method = class_getInstanceMethod(UIView.self, #selector(getter: UIView.safeAreaInsets)) {
-                let safeAreaInsets: @convention(block) (AnyObject) -> UIEdgeInsets = { _ in
-                    return .zero
+                let safeAreaInsets: @convention(block) (AnyObject) -> UIEdgeInsets = { [weak self] _ in
+                    return self?.view.window?.safeAreaInsets ?? UIApplication.shared.windows
+                        .sorted { $1.isKeyWindow }
+                        .map { $0.safeAreaInsets }
+                        .first { $0 != .zero } ?? .zero
                 }
                 class_addMethod(viewSubclass, #selector(getter: UIView.safeAreaInsets), imp_implementationWithBlock(safeAreaInsets), method_getTypeEncoding(method))
             }
