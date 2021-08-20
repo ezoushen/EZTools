@@ -42,6 +42,9 @@ public protocol ViewComponent {
     associatedtype ViewModel: AppArchitecture.ViewModel = EmptyViewModel
     
     static func setupAppearance()
+
+    // SwiftUI only
+    var avoidKeyboard: Bool { get }
     
     var viewModel: ViewModel { get }
     
@@ -74,6 +77,8 @@ public extension ViewComponent {
     func viewDidLayoutSubviews(_ view: UIView) { }
     
     func viewWillLayoutSubviews(_ view: UIView) { }
+
+    var avoidKeyboard: Bool { true }
 }
 
 public extension ViewComponent where ViewModel == EmptyViewModel {
@@ -115,7 +120,9 @@ fileprivate class ViewController<View: ViewComponent & SwiftUI.View>: UIViewCont
 extension ViewComponent where Self: View {
     public func asViewController() -> UIViewController {
         let hostingController = HostingController(rootView: self)
-        hostingController.disableKeyboardAvoidance()
+        if avoidKeyboard {
+            hostingController.disableKeyboardAvoidance()
+        }
         return ViewController(hostingController)
     }
 }
