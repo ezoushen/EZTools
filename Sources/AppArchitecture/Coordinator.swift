@@ -120,7 +120,7 @@ extension Coordinator {
         return controller
     }
     
-    func start(with parent: RootController) -> ResultPublisher {
+    public func start(with parent: RootController) -> ResultPublisher {
         present(viewController: controller, parentViewController: parent)
         return route(with: viewModel)
     }
