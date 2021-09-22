@@ -17,7 +17,7 @@ public protocol Localizable: NSObject, LanguageReloadable {
     func registerForLanguageChange(target: LanguageReloadable)
 }
 
-public extension Localizable where Self: NSObject {
+public extension Localizable {
     func registerForLanguageChange(target: LanguageReloadable) {
         NotificationCenter.default.addObserver(target, selector: #selector(target.reloadLanguage), name: .DidChangePrefferedLanguage, object: nil)
     }
