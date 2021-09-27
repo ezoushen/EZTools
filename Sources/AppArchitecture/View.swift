@@ -178,8 +178,6 @@ extension UIViewController {
     }
 }
 
-extension UIViewController: UIAdaptivePresentationControllerDelegate { }
-
 extension UIHostingController {
     func disableKeyboardAvoidance() {
         guard let viewClass = object_getClass(view) else { return }
