@@ -6,7 +6,7 @@ import UIKit
 private var innerClassKey: UInt32 = 0
 
 private class ViewControllerSwizzler<T: UIViewController> {
-    let viewController: T
+    unowned let viewController: T
 
     init(_ viewController: T) {
         self.viewController = viewController
