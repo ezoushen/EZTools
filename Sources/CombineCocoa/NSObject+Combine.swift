@@ -3,6 +3,35 @@
 import Combine
 import Foundation
 
+// MARK: Deallocation
+
+private var lifecycleTokenKey: UInt32 = 0
+
+public extension CBPublishers where Base: NSObject {
+
+    private class LifecycleToken {
+        let deallocatedSubject = PassthroughSubject<Void, Never>()
+        deinit {
+            deallocatedSubject.send()
+        }
+    }
+
+    private var token: LifecycleToken {
+        guard let token = objc_getAssociatedObject(base, &lifecycleTokenKey) as? LifecycleToken else {
+            let t = LifecycleToken()
+            objc_setAssociatedObject(base, &lifecycleTokenKey, t, .OBJC_ASSOCIATION_RETAIN)
+            return t
+        }
+        return token
+    }
+
+    func deallocated() -> AnyPublisher<Void, Never> {
+        token.deallocatedSubject.eraseToAnyPublisher()
+    }
+}
+
+// MARK: KVO
+
 public extension CBPublishers where Base: NSObject {
     func observe<T>(for key: String, type: T.Type, options: NSKeyValueObservingOptions = [.initial, .new]) -> KVOPublisher<Base, T> {
         KVOPublisher<Base, T>(subject: base, keyPath: key, options: options)
