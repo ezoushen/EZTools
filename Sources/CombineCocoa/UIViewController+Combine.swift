@@ -238,6 +238,29 @@ private class ViewControllerSwizzler<T: UIViewController> {
 
         return subject
     }()
+
+    lazy var didDismissSubject: PassthroughSubject<Void, Never> = {
+        let subject = PassthroughSubject<Void, Never>()
+
+        typealias Imp = @convention(c) (AnyObject, Selector, Bool, ((Bool) -> Void)?) -> Void
+        typealias Block = @convention(block) (AnyObject, Bool, ((Bool) -> Void)?) -> Void
+
+        let clazz: AnyClass = isa()!
+        let selector: Selector = #selector(T.dismiss(animated:completion:))
+        let method = class_getInstanceMethod(clazz, selector)!
+        let originIMP = method_getImplementation(method)
+        let originBlock = unsafeBitCast(originIMP, to: Imp.self)
+        let block: Block = { object, animated, completion in
+            originBlock(object, selector, animated, {
+                completion?($0)
+                subject.send()
+            })
+        }
+
+        method_setImplementation(method, imp_implementationWithBlock(block))
+
+        return subject
+    }()
 }
 
 private var swizzlerKey: UInt32 = 0
@@ -290,5 +313,9 @@ public extension CBPublishers where Base: UIViewController {
 
     func didReceiveMemoryWarning() -> AnyPublisher<Void, Never> {
         swizzler().didReceiveMemoryWarningSubject.eraseToAnyPublisher()
+    }
+
+    func didDismiss() -> AnyPublisher<Void, Never> {
+        swizzler().didDismissSubject.eraseToAnyPublisher()
     }
 }
