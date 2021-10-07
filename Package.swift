@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -12,28 +12,23 @@ let package = Package(
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
             name: "FontCase",
+            type: .dynamic,
             targets: ["FontCase"]),
         .library(
             name: "CombineCocoa",
+            type: .dynamic,
             targets: ["CombineCocoa"]),
         .library(
             name: "LayoutEngine",
+            type: .dynamic,
             targets: ["LayoutEngine"]),
         .library(
-            name: "SwiftUIPreview",
-            targets: ["SwiftUIPreview"]),
-        .library(
             name: "Localization",
+            type: .dynamic,
             targets: ["Localization"]),
         .library(
             name: "AppArchitecture",
             targets: ["AppArchitecture"]),
-        .library(name: "EZTools", type: .dynamic, targets: [
-            "FontCase",
-            "CombineCocoa",
-            "LayoutEngine",
-            "Localization",
-            "AppArchitecture"])
         
     ],
     dependencies: [
@@ -51,9 +46,6 @@ let package = Package(
             dependencies: []),
         .target(
             name: "LayoutEngine",
-            dependencies: []),
-        .target(
-            name: "SwiftUIPreview",
             dependencies: []),
         .target(
             name: "Localization",
