@@ -167,6 +167,7 @@ extension UIViewController {
         
         addChild(viewController)
         viewController.view.frame.size = view.frame.size
+        viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(viewController.view)
         viewController.didMove(toParent: self)
     }
