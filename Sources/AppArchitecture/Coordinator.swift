@@ -12,7 +12,7 @@ enum CoordinatorKey {
 }
 
 public protocol Coordinatable: AnyObject {
-    func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Coordinator.Failure>
+    func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, waitUntilViewDismissed: Bool) -> AnyPublisher<Coordinator.Result, Coordinator.Failure>
 }
 
 public protocol Coordinator: Coordinatable {
@@ -30,7 +30,7 @@ public protocol Coordinator: Coordinatable {
     func makeController(from: UIViewController) -> Controller
     
     func present(viewController: Controller, parentViewController: RootController)
-    func dismiss(viewController: Controller)
+    func dismiss(viewController: Controller, completion: (() -> Void)?)
     
     func route(with viewModel: View.ViewModel) -> ResultPublisher
     
@@ -78,6 +78,10 @@ extension Coordinatable {
         return (children.allObjects as! [Coordinatable]).flatMap {
             $0.findAll(type)
         }
+    }
+
+    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> {
+        coordinate(to: coordinator, waitUntilViewDismissed: false)
     }
 }
 
@@ -135,7 +139,7 @@ extension Coordinator {
         coordinator.cancellables = []
     }
     
-    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> {
+    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, waitUntilViewDismissed: Bool) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> {
         guard !children.allObjects
             .map({ String(describing: type(of: $0))})
             .contains(String(describing: type(of: coordinator))) else {
@@ -156,11 +160,26 @@ extension Coordinator {
         }
         
         return coordinator.start(with: controller)
-            .map { [weak coordinator] value -> Coordinator.Result in
+            .flatMap { [weak coordinator]
+                value -> AnyPublisher<Coordinator.Result, Coordinator.Failure> in
                 View.setupAppearance()
-                guard let coordinator = coordinator else { return value }
-                coordinator.dismiss(viewController: coordinator.controller)
-                return value
+                guard let coordinator = coordinator else {
+                    return Just(value)
+                        .setFailureType(to: Coordinator.Failure.self)
+                        .eraseToAnyPublisher()
+                }
+                if waitUntilViewDismissed {
+                    let subject = PassthroughSubject<Coordinator.Result, Coordinator.Failure>()
+                    coordinator.dismiss(viewController: coordinator.controller) {
+                        subject.send(value)
+                    }
+                    return subject.eraseToAnyPublisher()
+                } else {
+                    coordinator.dismiss(viewController: coordinator.controller, completion: nil)
+                    return Just(value)
+                        .setFailureType(to: Coordinator.Failure.self)
+                        .eraseToAnyPublisher()
+                }
             }
             .map { [weak self, weak coordinator] value -> Coordinator.Result in
                 if let coordinator = coordinator {
@@ -196,8 +215,10 @@ public extension Coordinator where RootController: UINavigationController, Contr
         parentViewController.pushViewController(viewController, animated: true)
     }
     
-    func dismiss(viewController: Controller) {
-        viewController.navigationController?.popViewController(animated: true)
+    func dismiss(viewController: Controller, completion: (() -> Void)?) {
+        CATransaction.emit(completion: completion) {
+            viewController.navigationController?.popViewController(animated: true)
+        }
     }
 }
 
@@ -206,13 +227,25 @@ public extension Coordinator where RootController: UIViewController, Controller:
         parentViewController.present(viewController, animated: true, completion: nil)
     }
     
-    func dismiss(viewController: Controller) {
-        viewController.dismiss(animated: true, completion: nil)
+    func dismiss(viewController: Controller, completion: (() -> Void)?) {
+        defaultDismiss(viewController: viewController, completion: completion)
+    }
+
+    func defaultDismiss(viewController: Controller, completion: (() -> Void)?) {
+        if let navigationController = viewController.navigationController,
+           navigationController.children.first != viewController
+        {
+            CATransaction.emit(completion: completion) {
+                navigationController.popViewController(animated: true)
+            }
+        } else {
+            viewController.dismiss(animated: true, completion: completion)
+        }
     }
 }
 
 public extension Coordinator where RootController == UIWindow {
-    func dismiss(viewController: Controller) { }
+    func dismiss(viewController: Controller, completion: (() -> Void)?) { }
 }
 
 public extension Coordinator where View == EmptyView {
@@ -236,7 +269,7 @@ public extension RootCoordinator where Controller == UIWindow {
 public extension RootCoordinator {
     func present(viewController: Controller, parentViewController: RootController) { }
     
-    func dismiss(viewController: Controller) { }
+    func dismiss(viewController: Controller, completion: (() -> Void)?) { completion?() }
     
     func route(with viewModel: View.ViewModel) -> ResultPublisher {
         route()
@@ -292,5 +325,14 @@ open class ActionCoordinator: Coordinator {
         action()
         
         return Just(()).eraseToAnyPublisher()
+    }
+}
+
+extension CATransaction {
+    public static func emit(completion: (() -> Void)?, transaction: () -> Void) {
+        begin()
+        setCompletionBlock(completion)
+        transaction()
+        commit()
     }
 }
