@@ -40,18 +40,33 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "FontCase",
-            dependencies: []),
+            dependencies: [],
+            linkerSettings: [
+                .unsafeFlags(["-Xlinker", "-no_application_extension"])
+            ]),
         .target(
             name: "CombineCocoa",
-            dependencies: []),
+            dependencies: [],
+            linkerSettings: [
+                .unsafeFlags(["-Xlinker", "-no_application_extension"])
+            ]),
         .target(
             name: "LayoutEngine",
-            dependencies: []),
+            dependencies: [],
+            linkerSettings: [
+                .unsafeFlags(["-Xlinker", "-no_application_extension"])
+            ]),
         .target(
             name: "Localization",
-            dependencies: []),
+            dependencies: [],
+            linkerSettings: [
+                .unsafeFlags(["-Xlinker", "-no_application_extension"])
+            ]),
         .target(
             name: "AppArchitecture",
-            dependencies: []),
+            dependencies: [],
+            linkerSettings: [
+                .unsafeFlags(["-Xlinker", "-no_application_extension"])
+            ]),
     ]
 )
