@@ -29,6 +29,10 @@ let package = Package(
         .library(
             name: "AppArchitecture",
             targets: ["AppArchitecture"]),
+        .library(
+            name: "AsyncCombine",
+            type: .dynamic,
+            targets: ["AsyncCombine"])
         
     ],
     dependencies: [
@@ -68,5 +72,10 @@ let package = Package(
             linkerSettings: [
                 .unsafeFlags(["-Xlinker", "-no_application_extension"])
             ]),
+        .target(
+            name: "AsyncCombine",
+            linkerSettings: [
+                .unsafeFlags(["-Xlinker", "-no_application_extension"])
+            ])
     ]
 )
