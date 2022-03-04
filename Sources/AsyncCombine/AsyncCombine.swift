@@ -70,6 +70,10 @@ extension Single where Failure == Never {
 }
 
 extension Publisher {
+    public func getSingleResult() async throws -> Output? {
+        return try await asSingle().getResult()
+    }
+    
     public func getResult() async throws -> [Output] {
         var cancellables: Set<AnyCancellable> = []
         return try await withCheckedThrowingContinuation {
@@ -91,6 +95,10 @@ extension Publisher {
 }
 
 extension Publisher where Failure == Never {
+    public func getSingleResult() async -> Output? {
+        return await asSingle().getResult()
+    }
+    
     public func getResult() async -> [Output] {
         var cancellables: Set<AnyCancellable> = []
         return await withCheckedContinuation {
