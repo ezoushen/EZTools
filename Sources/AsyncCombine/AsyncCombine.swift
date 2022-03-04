@@ -155,3 +155,29 @@ public extension Publisher where Self.Failure == Never {
         AsyncPublisherSequence(self)
     }
 }
+
+extension Future {
+    public static func asyncThrowing(_ block: @escaping () async throws -> Output) -> Future<Output, Failure> {
+        Future { resolver in
+            Task {
+                do {
+                    let output = try await block()
+                    resolver(.success(output))
+                } catch let error as Failure {
+                    resolver(.failure(error))
+                }
+            }
+        }
+    }
+}
+
+extension Future where Failure == Never {
+    public static func async(_ block: @escaping () async -> Output) -> Future<Output, Failure> {
+        Future { resolver in
+            Task {
+                let output = await block()
+                resolver(.success(output))
+            }
+        }
+    }
+}
