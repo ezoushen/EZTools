@@ -5,6 +5,13 @@ import UIKit
 
 private var innerClassKey: UInt32 = 0
 
+extension Unmanaged {
+    @inlinable
+    func getAddress() -> String {
+        String(format: "%p", Int(bitPattern: toOpaque()))
+    }
+}
+
 private class ViewControllerSwizzler<T: UIViewController> {
     unowned let viewController: T
 
@@ -16,12 +23,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
         let value = objc_getAssociatedObject(viewController, &innerClassKey) as? NSNumber
         ?? NSNumber(booleanLiteral: false)
         guard value == false else { return object_getClass(viewController) }
-        guard let clazz = objc_allocateClassPair(
-            object_getClass(viewController),
-            "CombineCocoa_\(String(describing: T.self))",
-            0)
+        let address = Unmanaged.passUnretained(viewController).getAddress()
+        guard let currentClass = object_getClass(viewController),
+              let clazz = objc_allocateClassPair(
+                currentClass, "CombineCocoa_\(currentClass)_\(address)", 0)
         else { return object_getClass(viewController) }
-
         objc_registerClassPair(clazz)
         object_setClass(viewController, clazz)
         objc_setAssociatedObject(
@@ -29,7 +35,6 @@ private class ViewControllerSwizzler<T: UIViewController> {
             &innerClassKey,
             NSNumber(booleanLiteral: true),
             .OBJC_ASSOCIATION_RETAIN)
-
         return clazz
     }
 
@@ -49,7 +54,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -70,7 +79,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector, animated)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -90,7 +103,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector, animated)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -111,7 +128,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector, animated)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -131,7 +152,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector, animated)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -152,7 +177,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -172,7 +201,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -193,7 +226,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector, parent)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -213,7 +250,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector, parent)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -234,7 +275,11 @@ private class ViewControllerSwizzler<T: UIViewController> {
             originBlock(object, selector)
         }
 
-        method_setImplementation(method, imp_implementationWithBlock(block))
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
 
         return subject
     }()
@@ -256,9 +301,13 @@ private class ViewControllerSwizzler<T: UIViewController> {
                 subject.send()
             })
         }
-
-        method_setImplementation(method, imp_implementationWithBlock(block))
-
+        
+        class_replaceMethod(
+            clazz,
+            selector,
+            imp_implementationWithBlock(block),
+            method_getTypeEncoding(method))
+        
         return subject
     }()
 }
