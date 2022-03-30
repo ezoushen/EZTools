@@ -203,8 +203,18 @@ public final class GestureSubscription<S: Subscriber, G: Gesture>: NSObject, Sub
     public func request(_ demand: Subscribers.Demand) { }
     
     public func cancel() {
+        perform(
+            #selector(GestureSubscription.cleanup),
+            on: .main,
+            with: nil,
+            waitUntilDone: Thread.isMainThread)
+    }
+    
+    @objc
+    private func cleanup() {
         gesture.recognizer.reset()
-        gesture.recognizer.removeTarget(self, action: #selector(handler))
+        gesture.recognizer.removeTarget(
+            self, action: #selector(GestureSubscription.handler))
         view?.removeGestureRecognizer(gesture.recognizer)
         view = nil
     }
