@@ -5,13 +5,22 @@ import Foundation
 @dynamicCallable
 @dynamicMemberLookup
 public struct Localized {
+    private static var overridenData: [String: String] = [:]
+    
     public static subscript(dynamicMember key: String) -> Localized {
         Localized(key: key)
     }
-    
+
+#if DEBUG
+    public static subscript(dynamicMember key: String) -> String {
+        get { Localized(key: key).description }
+        set { overridenData[key] = newValue }
+    }
+#else
     public static subscript(dynamicMember key: String) -> String {
         Localized(key: key).description
     }
+#endif
     
     public subscript(dynamicMember key: String) -> Localized {
         Localized(key: key, args: args, tableName: tableName, comment: comment)
@@ -48,7 +57,11 @@ public struct Localized {
     }
 
     public var string: String {
+#if DEBUG
+        let format = Localized.overridenData[key] ?? NSLocalizedString(key, tableName: tableName, comment: comment ?? "")
+#else
         let format = NSLocalizedString(key, tableName: tableName, comment: comment ?? "")
+#endif
         guard args.isEmpty == false, format.isEmpty == false
         else { return format.isEmpty ? key : format }
         return String(format: format, arguments: args)
