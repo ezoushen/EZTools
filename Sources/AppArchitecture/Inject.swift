@@ -53,9 +53,23 @@ fileprivate class InjectContainer {
     func register<T>(_ type: T.Type, value: T) {
         container[String(reflecting: type)] = value
     }
+
+    func registerLazily<T>(_ type: T.Type, value: @escaping () -> T) {
+        container[String(reflecting: type)] = value
+    }
     
     func load<T>(_ type: T.Type) -> T? {
-        container[String(reflecting: type)] as? T
+        let key = String(reflecting: type)
+        let value = container[key]
+        if let value = value as? T {
+            return value
+        } else if let value = value as? () -> T {
+            let lazyValue = value()
+            container[key] = lazyValue
+            return lazyValue
+        } else {
+            return nil
+        }
     }
     
     func revoke<T>(_ type: T.Type) {
@@ -67,6 +81,12 @@ extension Injectee where Self: AnyObject {
     @discardableResult
     public func inject<T: AnyObject>(_ value: T) -> Self {
         injectContainer.register(T.self, value: value)
+        return self
+    }
+
+    @discardableResult
+    public func injectLazily<T: AnyObject>(_ value: @escaping () -> T) -> Self {
+        injectContainer.registerLazily(T.self, value: value)
         return self
     }
     
