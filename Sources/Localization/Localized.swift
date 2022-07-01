@@ -5,13 +5,15 @@ import Foundation
 @dynamicCallable
 @dynamicMemberLookup
 public struct Localized {
-    private static var overridenData: [String: String] = [:]
-    
+    private static let cache: NSCache<NSString, NSString> = .init()
+
     public static subscript(dynamicMember key: String) -> Localized {
         Localized(key: key)
     }
 
 #if DEBUG
+    private static var overridenData: [String: String] = [:]
+
     public static subscript(dynamicMember key: String) -> String {
         get { Localized(key: key).description }
         set { overridenData[key] = newValue }
@@ -57,11 +59,18 @@ public struct Localized {
     }
 
     public var string: String {
+        let cachedValue = Self.cache.object(forKey: key as NSString) as? String
 #if DEBUG
-        let format = Localized.overridenData[key] ?? NSLocalizedString(key, tableName: tableName, comment: comment ?? "")
+        let format = Self.cache.object(forKey: key as NSString) as? String
+            ?? Localized.overridenData[key]
+            ?? NSLocalizedString(key, tableName: tableName, comment: comment ?? "")
 #else
-        let format = NSLocalizedString(key, tableName: tableName, comment: comment ?? "")
+        let format = Self.cache.object(forKey: key as NSString) as? String
+            ?? NSLocalizedString(key, tableName: tableName, comment: comment ?? "")
 #endif
+        if cachedValue == nil {
+            Self.cache.setObject(format as NSString, forKey: key as NSString)
+        }
         guard args.isEmpty == false, format.isEmpty == false
         else { return format.isEmpty ? key : format }
         return String(format: format, arguments: args)
