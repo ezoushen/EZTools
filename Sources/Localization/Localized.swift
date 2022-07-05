@@ -7,16 +7,19 @@ import Foundation
 public struct Localized {
     private static let cache: NSCache<NSString, NSString> = .init()
 
+    /// Invalidate cached strings and overriden data in debug mode
+    public static func invalidateCache() {
+        cache.removeAllObjects()
+    }
+
     public static subscript(dynamicMember key: String) -> Localized {
         Localized(key: key)
     }
 
 #if DEBUG
-    private static var overridenData: [String: String] = [:]
-
     public static subscript(dynamicMember key: String) -> String {
         get { Localized(key: key).description }
-        set { overridenData[key] = newValue }
+        set { cache.setObject(newValue as NSString, forKey: key as NSString) }
     }
 #else
     public static subscript(dynamicMember key: String) -> String {
@@ -62,7 +65,6 @@ public struct Localized {
         let cachedValue = Self.cache.object(forKey: key as NSString) as? String
 #if DEBUG
         let format = Self.cache.object(forKey: key as NSString) as? String
-            ?? Localized.overridenData[key]
             ?? NSLocalizedString(key, tableName: tableName, comment: comment ?? "")
 #else
         let format = Self.cache.object(forKey: key as NSString) as? String
