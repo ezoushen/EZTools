@@ -4,9 +4,10 @@ import Foundation
 import SwiftUI
 
 @propertyWrapper
-public class Inject<Value: AnyObject>: ObservableObject {
+public class Inject<Value>: ObservableObject {
         
-    fileprivate weak var _value: Value?
+    fileprivate weak var _reference: AnyObject?
+    fileprivate var _value: Value?
     
     public var wrappedValue: Value {
         fatalError("Do not access wrappedValue directly")
@@ -21,12 +22,24 @@ public class Inject<Value: AnyObject>: ObservableObject {
     ) -> Value {
         let currentValue: Value? = {
             let inject = observed[keyPath: storageKeyPath]
-            guard let value = inject._value else {
-                let container = observed.injectContainer
-                inject._value = container.load(Value.self)
-                return inject._value
+
+            if Value.self is AnyObject.Type {
+                guard let value = inject._reference as? Value else {
+                    let container = observed.injectContainer
+                    let value =  container.load(Value.self)
+                    inject._reference = value as? AnyObject
+                    return value
+                }
+                return value
+            } else {
+                guard let value = inject._value else {
+                    let container = observed.injectContainer
+                    let value =  container.load(Value.self)
+                    inject._value = value
+                    return value
+                }
+                return value
             }
-            return value
         }()
         
         guard let result = currentValue else {
@@ -79,13 +92,13 @@ fileprivate class InjectContainer {
 
 extension Injectee where Self: AnyObject {
     @discardableResult
-    public func inject<T: AnyObject>(_ value: T) -> Self {
+    public func inject<T>(_ value: T) -> Self {
         injectContainer.register(T.self, value: value)
         return self
     }
 
     @discardableResult
-    public func injectLazily<T: AnyObject>(_ value: @escaping () -> T) -> Self {
+    public func injectLazily<T>(_ value: @escaping () -> T) -> Self {
         injectContainer.registerLazily(T.self, value: value)
         return self
     }
