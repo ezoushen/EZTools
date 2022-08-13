@@ -96,7 +96,7 @@ public protocol ViewComponent {
     static func setupAppearance()
 
     // SwiftUI only
-    var avoidKeyboard: Bool { get }
+    var disableKeyboardAvoidance: Bool { get }
     
     var viewModel: ViewModel { get }
     
@@ -130,7 +130,7 @@ public extension ViewComponent {
     
     func viewWillLayoutSubviews(_ view: UIView) { }
 
-    var avoidKeyboard: Bool { true }
+    var disableKeyboardAvoidance: Bool { true }
 }
 
 public extension ViewComponent where ViewModel == EmptyViewModel {
@@ -172,7 +172,7 @@ fileprivate class ViewController<View: ViewComponent & SwiftUI.View>: UIViewCont
 extension ViewComponent where Self: View {
     public func asViewController() -> UIViewController {
         let hostingController = HostingController(rootView: self)
-        if avoidKeyboard {
+        if disableKeyboardAvoidance {
             hostingController.disableKeyboardAvoidance()
         }
         return ViewController(hostingController)
@@ -236,11 +236,16 @@ extension UIHostingController {
             guard let viewSubclass = objc_allocateClassPair(viewClass, viewClassNameUtf8, 0) else { return }
 
             if let method = class_getInstanceMethod(UIView.self, #selector(getter: UIView.safeAreaInsets)) {
-                let safeAreaInsets: @convention(block) (AnyObject) -> UIEdgeInsets = { [weak self] _ in
-                    return self?.view.window?.safeAreaInsets ?? UIApplication.shared.windows
-                        .sorted { $1.isKeyWindow }
-                        .map { $0.safeAreaInsets }
-                        .first { $0 != .zero } ?? .zero
+                let safeAreaInsets: @convention(block) (AnyObject) -> UIEdgeInsets = { obj in
+                    guard let view = obj as? UIView, let window = view.window else { return .zero }
+                    let globalFrame = view.convert(view.frame, to: window)
+                    let safeArea = window.safeAreaInsets
+                    let inset = UIEdgeInsets(
+                        top: globalFrame.minY == 0 ? max(0, safeArea.top - globalFrame.minY) : 0,
+                        left: globalFrame.minX == 0 ? max(0, safeArea.left - globalFrame.minX) : 0,
+                        bottom: globalFrame.maxY == window.frame.maxY ? max(0, safeArea.bottom - window.frame.height + globalFrame.maxY) : 0,
+                        right: globalFrame.maxX == window.frame.minX ? max(0, safeArea.right - window.frame.width + globalFrame.maxX) : 0)
+                    return inset
                 }
                 class_addMethod(viewSubclass, #selector(getter: UIView.safeAreaInsets), imp_implementationWithBlock(safeAreaInsets), method_getTypeEncoding(method))
             }
