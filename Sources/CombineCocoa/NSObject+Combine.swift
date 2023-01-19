@@ -42,59 +42,92 @@ public extension CBPublishers where Base: NSObject {
     }
 }
 
-public struct KVOPublisher<Object: NSObject, Observed>: Publisher {
-    
-    public typealias Output = Observed?
+public struct KVOPublisher<T: NSObject, Output>: Combine.Publisher {
     public typealias Failure = Never
-    
-    public let subject: Object
+
+    public let subject: T
     public let keyPath: String
     public let options: NSKeyValueObservingOptions
-    
-    public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
-        let subscription = KVOSubscription<S, Observed>(subject: subject, subscriber: subscriber, keyPath: keyPath, options: options)
+
+    public func receive<S>(subscriber: S)
+    where S : Subscriber, Never == S.Failure, Output == S.Input {
+        let subscription = Subscription(
+            subject: subject,
+            subscriber: subscriber,
+            keyPath: keyPath,
+            options: options)
         subscriber.receive(subscription: subscription)
         subscription.subscribe()
     }
-}
 
-public class KVOSubscription<SubscribeType: Subscriber, Observed>: NSObject, Subscription where SubscribeType.Input == Observed? {
-    public typealias Output = Observed?
-    
-    private var context: Int = 0
-    private let keyPath: String
-    private let options: NSKeyValueObservingOptions
-    private var subscriber: SubscribeType?
-    private var subject: NSObject?
-    private var isSubcribed: Bool = false
-    init(subject: NSObject, subscriber: SubscribeType, keyPath: String, options: NSKeyValueObservingOptions) {
-        self.subscriber = subscriber
-        self.keyPath = keyPath
-        self.options = options
-        self.subject = subject
-        
-        super.init()
-    }
-    
-    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard self.keyPath == keyPath else { return }
-        _ = subscriber?.receive(change?[.newKey] as? Observed)
-    }
-    
-    func subscribe() {
-        subject?.addObserver(self, forKeyPath: keyPath, options: options, context: &context)
-        isSubcribed = true
-    }
-    
-    public func request(_ demand: Subscribers.Demand) { }
-    
-    public func cancel() {
-        DispatchQueue.main.async {
-            if self.isSubcribed {
-                self.subject?.removeObserver(self, forKeyPath: self.keyPath)
+    public class Subscription<S: Combine.Subscriber>: NSObject, Combine.Subscription
+    where S.Input == Output {
+        private let keyPath: String
+        private let options: NSKeyValueObservingOptions
+
+        private var subscriber: S?
+        private var subject: NSObject?
+
+        private var waitingForCancellation: Bool = false
+        private var lock = os_unfair_lock()
+
+        private var demand: Subscribers.Demand = .none
+
+        init(subject: NSObject, subscriber: S, keyPath: String, options: NSKeyValueObservingOptions) {
+            self.subscriber = subscriber
+            self.keyPath = keyPath
+            self.options = options
+            self.subject = subject
+
+            super.init()
+        }
+
+        public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+            sendValue(change: change, key: .oldKey)
+            sendValue(change: change, key: .newKey)
+        }
+
+        private func sendValue(change: [NSKeyValueChangeKey : Any]?, key: NSKeyValueChangeKey) {
+            guard change?.keys.contains(key) == true,
+                  let value = change?[key] as? Output
+            else { return }
+            send(value: value)
+        }
+
+        private func send(value: S.Input) {
+            guard demand > 0 else { return }
+            demand -= 1
+            demand += subscriber?.receive(value) ?? .none
+        }
+
+        func subscribe() {
+            os_unfair_lock_lock(&lock)
+            subject?.addObserver(
+                self, forKeyPath: keyPath, options: options, context: nil)
+            if waitingForCancellation {
+                removeObservation()
             }
-            self.subject = nil
-            self.subscriber = nil
+            os_unfair_lock_unlock(&lock)
+        }
+
+        public func request(_ demand: Subscribers.Demand) {
+            self.demand += demand
+        }
+
+        public func cancel() {
+            if os_unfair_lock_trylock(&lock) {
+                removeObservation()
+                os_unfair_lock_unlock(&lock)
+            } else {
+                waitingForCancellation = true
+            }
+        }
+
+        private func removeObservation() {
+            subject?.removeObserver(self, forKeyPath: keyPath)
+            subscriber?.receive(completion: .finished)
+            subject = nil
+            subscriber = nil
         }
     }
 }
