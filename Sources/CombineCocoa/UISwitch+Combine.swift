@@ -22,7 +22,7 @@ public struct TogglePublisher: Publisher {
     class Subscription<S: Subscriber>: Combine.Subscription where S.Input == Bool, S.Failure == Never {
         
         var subscriber: S?
-        
+        var demand: Subscribers.Demand = .none
         var toggle: UISwitch?
         
         init(_ subscriber: S, toggle: UISwitch) {
@@ -33,11 +33,15 @@ public struct TogglePublisher: Publisher {
         }
         
         @objc func onValueChanged(_ toggle: UISwitch) {
-            _ = subscriber?.receive(toggle.isOn)
+            guard demand > 0 else { return }
+            demand -= 1
+            if let result = subscriber?.receive(toggle.isOn) {
+                demand += result
+            }
         }
         
         func request(_ demand: Subscribers.Demand) {
-            
+            self.demand = demand
         }
         
         func cancel() {

@@ -180,7 +180,7 @@ public extension GestureType {
 public final class GestureSubscription<S: Subscriber, G: Gesture>: NSObject, Subscription, UIGestureRecognizerDelegate where S.Input == G, S.Failure == Never {
     private var subscriber: S
     private var gesture: G
-        
+    private var demand: Subscribers.Demand = .none
     private weak var view: UIView?
     
     init(subscriber: S, view: UIView, gesture: G) {
@@ -200,7 +200,9 @@ public final class GestureSubscription<S: Subscriber, G: Gesture>: NSObject, Sub
         view?.addGestureRecognizer(recognizer)
     }
     
-    public func request(_ demand: Subscribers.Demand) { }
+    public func request(_ demand: Subscribers.Demand) {
+        self.demand = demand
+    }
     
     public func cancel() {
         perform(
@@ -221,7 +223,9 @@ public final class GestureSubscription<S: Subscriber, G: Gesture>: NSObject, Sub
     
     @objc
     private func handler() {
-        _ = subscriber.receive(gesture)
+        guard demand > 0 else { return }
+        demand -= 1
+        demand += subscriber.receive(gesture)
     }
 }
 

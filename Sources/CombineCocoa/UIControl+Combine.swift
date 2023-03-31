@@ -26,6 +26,7 @@ public struct UIControlPublisher<Control: UIControl>: Publisher {
 public final class UIControlSubscription<SubscribeType: Subscriber, Control: UIControl>: Subscription where SubscribeType.Input == Control {
     weak var control: Control?
     var subscriber: SubscribeType?
+    var demand: Subscribers.Demand = .none
     let event: UIControl.Event
     
     init(subscriber: SubscribeType, control: Control?, event: UIControl.Event) {
@@ -35,7 +36,9 @@ public final class UIControlSubscription<SubscribeType: Subscriber, Control: UIC
         self.control?.addTarget(self, action: #selector(eventAction), for: event)
     }
     
-    public func request(_ demand: Subscribers.Demand) { }
+    public func request(_ demand: Subscribers.Demand) {
+        self.demand = demand
+    }
     
     public func cancel() {
         subscriber = nil
@@ -43,8 +46,11 @@ public final class UIControlSubscription<SubscribeType: Subscriber, Control: UIC
     
     @objc
     private func eventAction() {
-        guard let control = control else { return }
-        _ = subscriber?.receive(control)
+        guard let control = control, demand > 0 else { return }
+        demand -= 1
+        if let result = subscriber?.receive(control) {
+            demand += result
+        }
     }
 }
 

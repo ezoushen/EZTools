@@ -15,7 +15,6 @@ extension Task: Publisher {
     where S : Subscriber, Failure == S.Failure, Success == S.Input {
         let subscription = Subscription(subscriber: subscriber, action: self)
         subscriber.receive(subscription: subscription)
-        subscription.start()
     }
     
     class Subscription<S: Subscriber>: Combine.Subscription
@@ -45,7 +44,10 @@ extension Task: Publisher {
             }
         }
         
-        func request(_ demand: Subscribers.Demand) { }
+        func request(_ demand: Subscribers.Demand) {
+            guard demand > 0 else { return }
+            start()
+        }
         
         func cancel() {
             task?.cancel()

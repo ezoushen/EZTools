@@ -29,6 +29,8 @@ public struct UIBarButtonItemPublisher: Publisher {
 
         var subscriber: S?
 
+        var demand: Subscribers.Demand = .none
+
         init(barButtonItem: UIBarButtonItem?, subscriber: S) {
             self.subscriber = subscriber
             self.barButtonItem = barButtonItem
@@ -47,7 +49,9 @@ public struct UIBarButtonItemPublisher: Publisher {
             barButtonItem?.action = #selector(buttonAction(_:))
         }
 
-        func request(_ demand: Subscribers.Demand) { }
+        func request(_ demand: Subscribers.Demand) {
+            self.demand = demand
+        }
 
         func cancel() {
             subscriber = nil
@@ -78,7 +82,12 @@ public struct UIBarButtonItemPublisher: Publisher {
             if let target = previousObject, let action = previousSelector {
                 target.performSelector(onMainThread: action, with: sender, waitUntilDone: true)
             }
-            _ = subscriber?.receive(())
+            if demand > 0 {
+                demand -= 1
+                if let result = subscriber?.receive(()) {
+                    demand += result
+                }
+            }
         }
     }
 }
