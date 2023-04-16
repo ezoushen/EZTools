@@ -175,7 +175,11 @@ extension ViewComponent where Self: View {
         if disableKeyboardAvoidance {
             hostingController.disableKeyboardAvoidance()
         }
-        return ViewController(hostingController)
+        if #available(iOS 15.0, *) {
+            return hostingController
+        } else {
+            return ViewController(hostingController)
+        }
     }
 }
 
