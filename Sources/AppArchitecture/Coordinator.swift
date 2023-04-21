@@ -188,7 +188,6 @@ extension Coordinator {
                     }
                     
                     self?.release(coordinator)
-                    objc_removeAssociatedObjects(coordinator)
                 }
                 return value
             }
