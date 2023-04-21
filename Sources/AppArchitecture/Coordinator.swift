@@ -135,7 +135,6 @@ extension Coordinator {
     
     func release<Coordinator: AppArchitecture.Coordinator>(_ coordinator: Coordinator) {
         children.remove(coordinator)
-        coordinator.viewModel.cancellables = []
         coordinator.cancellables = []
     }
     
