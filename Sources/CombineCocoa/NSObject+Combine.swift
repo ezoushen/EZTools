@@ -57,7 +57,6 @@ public struct KVOPublisher<T: NSObject, Output>: Combine.Publisher {
             keyPath: keyPath,
             options: options)
         subscriber.receive(subscription: subscription)
-        subscription.subscribe()
     }
 
     public class Subscription<S: Combine.Subscriber>: NSObject, Combine.Subscription
@@ -112,6 +111,7 @@ public struct KVOPublisher<T: NSObject, Output>: Combine.Publisher {
 
         public func request(_ demand: Subscribers.Demand) {
             self.demand += demand
+            self.subscribe()
         }
 
         public func cancel() {
