@@ -5,6 +5,7 @@ import Combine
 import UIKit
 
 enum CoordinatorKey {
+    static var parent:      UInt = 0x0
     static var children:    UInt = 0x1
     static var view:        UInt = 0x2
     static var viewModel:   UInt = 0x3
@@ -51,6 +52,15 @@ public extension Coordinator {
 }
 
 extension Coordinatable {
+    public internal(set) var parent: (any Coordinator)? {
+        get {
+            objc_getAssociatedObject(self, &CoordinatorKey.parent) as? (any Coordinator)
+        }
+        set {
+            objc_setAssociatedObject(self, &CoordinatorKey.parent, newValue, .OBJC_ASSOCIATION_ASSIGN)
+        }
+    }
+
     public var children: NSHashTable<AnyObject> {
         guard let table = objc_getAssociatedObject(self, &CoordinatorKey.children) as? NSHashTable<AnyObject> else {
             let table = NSHashTable<AnyObject>()
@@ -130,11 +140,13 @@ extension Coordinator {
     }
     
     func store<Coordinator: AppArchitecture.Coordinator>(_ coordinator: Coordinator) {
+        coordinator.parent = self
         children.add(coordinator)
     }
     
     func release<Coordinator: AppArchitecture.Coordinator>(_ coordinator: Coordinator) {
         children.remove(coordinator)
+        coordinator.parent = nil
         coordinator.cancellables = []
     }
     
