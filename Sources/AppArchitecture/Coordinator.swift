@@ -39,16 +39,21 @@ public protocol Coordinator: Coordinatable {
     func didCoordinate<Child: Coordinator>(to coordinator: Child)
     func willRelease<Child: Coordinator>(coordinator: Child)
     func didRelease<Child: Coordinator>(coordinator: Child)
+    func willAttach<Parent: Coordinator>(to parent: Parent)
+    func didAttach<Parent: Coordinator>(to parent: Parent)
+    func willDetach<Parent: Coordinator>(from parent: Parent)
+    func didDetatch<Parent: Coordinator>(from parent: Parent)
 }
 
 public extension Coordinator {
     func willCoordinate<Child: Coordinator>(to coordinator: Child) { }
-    
     func didCoordinate<Child: Coordinator>(to coordinator: Child) { }
-    
     func willRelease<Child: Coordinator>(coordinator: Child) { }
-    
     func didRelease<Child: Coordinator>(coordinator: Child) { }
+    func willAttach<Parent: Coordinator>(to parent: Parent) { }
+    func didAttach<Parent: Coordinator>(to parent: Parent) { }
+    func willDetach<Parent: Coordinator>(from parent: Parent) { }
+    func didDetatch<Parent: Coordinator>(from parent: Parent) { }
 }
 
 extension Coordinatable {
@@ -140,11 +145,19 @@ extension Coordinator {
     }
     
     func store<Coordinator: AppArchitecture.Coordinator>(_ coordinator: Coordinator) {
+        coordinator.willAttach(to: self)
+        defer {
+            coordinator.didAttach(to: self)
+        }
         coordinator.parent = self
         children.add(coordinator)
     }
     
     func release<Coordinator: AppArchitecture.Coordinator>(_ coordinator: Coordinator) {
+        coordinator.willDetach(from: self)
+        defer {
+            coordinator.didDetatch(from: self)
+        }
         children.remove(coordinator)
         coordinator.parent = nil
         coordinator.cancellables = []
