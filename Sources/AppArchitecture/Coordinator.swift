@@ -10,10 +10,25 @@ enum CoordinatorKey {
     static var view:        UInt = 0x2
     static var viewModel:   UInt = 0x3
     static var controller:  UInt = 0x4
+    static var hookStore:   UInt = 0x5
 }
+
+typealias LifecycleHookStore =
+    [CoordinatorLifecycleHook: PassthroughSubject<any Coordinator, Never>]
 
 public protocol Coordinatable: AnyObject {
     func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, waitUntilViewDismissed: Bool) -> AnyPublisher<Coordinator.Result, Coordinator.Failure>
+}
+
+public enum CoordinatorLifecycleHook: Hashable {
+    case willCoordinate
+    case didCoordinate
+    case willRelease
+    case didRelease
+    case willAttach
+    case didAttach
+    case willDetach
+    case didDetach
 }
 
 public protocol Coordinator: Coordinatable {
@@ -42,7 +57,7 @@ public protocol Coordinator: Coordinatable {
     func willAttach<Parent: Coordinator>(to parent: Parent)
     func didAttach<Parent: Coordinator>(to parent: Parent)
     func willDetach<Parent: Coordinator>(from parent: Parent)
-    func didDetatch<Parent: Coordinator>(from parent: Parent)
+    func didDetach<Parent: Coordinator>(from parent: Parent)
 }
 
 public extension Coordinator {
@@ -53,7 +68,7 @@ public extension Coordinator {
     func willAttach<Parent: Coordinator>(to parent: Parent) { }
     func didAttach<Parent: Coordinator>(to parent: Parent) { }
     func willDetach<Parent: Coordinator>(from parent: Parent) { }
-    func didDetatch<Parent: Coordinator>(from parent: Parent) { }
+    func didDetach<Parent: Coordinator>(from parent: Parent) { }
 }
 
 extension Coordinatable {
@@ -63,6 +78,26 @@ extension Coordinatable {
         }
         set {
             objc_setAssociatedObject(self, &CoordinatorKey.parent, newValue, .OBJC_ASSOCIATION_ASSIGN)
+        }
+    }
+
+    fileprivate var lifecycleHookStore: LifecycleHookStore {
+        get {
+            guard let store = objc_getAssociatedObject(self, &CoordinatorKey.hookStore) as? LifecycleHookStore else {
+                let store = LifecycleHookStore()
+                defer {
+                    objc_setAssociatedObject(
+                        self,
+                        &CoordinatorKey.hookStore,
+                        store,
+                        .OBJC_ASSOCIATION_RETAIN)
+                }
+                return store
+            }
+            return store
+        }
+        set {
+            objc_setAssociatedObject(self, &CoordinatorKey.hookStore, newValue, .OBJC_ASSOCIATION_RETAIN)
         }
     }
 
@@ -100,6 +135,31 @@ extension Coordinatable {
     }
 }
 
+extension Coordinator {
+    func lifecycleHook(_ hook: CoordinatorLifecycleHook) -> AnyPublisher<any Coordinator, Never> {
+        if let hook = lifecycleHookStore[hook] {
+            return hook.eraseToAnyPublisher()
+        } else {
+            let subject = PassthroughSubject<any Coordinator, Never>()
+            lifecycleHookStore[hook] = subject
+            return subject.eraseToAnyPublisher()
+        }
+    }
+
+    func notify(hook: CoordinatorLifecycleHook, object: any Coordinator) {
+        defer { lifecycleHookStore[hook]?.send(object) }
+        switch hook {
+        case .willCoordinate:   willCoordinate(to: object)
+        case .didCoordinate:    didCoordinate(to: object)
+        case .willRelease:      willRelease(coordinator: object)
+        case .didRelease:       didRelease(coordinator: object)
+        case .willAttach:       willAttach(to: object)
+        case .didAttach:        didAttach(to: object)
+        case .willDetach:       willDetach(from: object)
+        case .didDetach:        didDetach(from: object)
+        }
+    }
+}
 
 extension Coordinator {
     public var cancellables: Set<AnyCancellable> {
@@ -145,18 +205,18 @@ extension Coordinator {
     }
     
     func store<Coordinator: AppArchitecture.Coordinator>(_ coordinator: Coordinator) {
-        coordinator.willAttach(to: self)
+        coordinator.notify(hook: .willAttach, object: self)
         defer {
-            coordinator.didAttach(to: self)
+            coordinator.notify(hook: .didAttach, object: self)
         }
         coordinator.parent = self
         children.add(coordinator)
     }
     
     func release<Coordinator: AppArchitecture.Coordinator>(_ coordinator: Coordinator) {
-        coordinator.willDetach(from: self)
+        coordinator.notify(hook: .willDetach, object: self)
         defer {
-            coordinator.didDetatch(from: self)
+            coordinator.notify(hook: .didDetach, object: self)
         }
         children.remove(coordinator)
         coordinator.parent = nil
@@ -170,9 +230,9 @@ extension Coordinator {
             return Empty<Coordinator.Result, Coordinator.Failure>().eraseToAnyPublisher()
         }
         
-        willCoordinate(to: coordinator)
+        notify(hook: .willCoordinate, object: coordinator)
         defer {
-            didCoordinate(to: coordinator)
+            notify(hook: .didCoordinate, object: coordinator)
         }
         
         store(coordinator)
@@ -207,9 +267,9 @@ extension Coordinator {
             }
             .map { [weak self, weak coordinator] value -> Coordinator.Result in
                 if let coordinator = coordinator {
-                    self?.willRelease(coordinator: coordinator)
+                    self?.notify(hook: .willRelease, object: coordinator)
                     defer {
-                        self?.didRelease(coordinator: coordinator)
+                        self?.notify(hook: .didRelease, object: coordinator)
                     }
                     
                     self?.release(coordinator)
