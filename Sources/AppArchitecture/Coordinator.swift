@@ -136,7 +136,7 @@ extension Coordinatable {
 }
 
 extension Coordinator {
-    func lifecycleHook(_ hook: CoordinatorLifecycleHook) -> AnyPublisher<any Coordinator, Never> {
+    public func lifecycleHook(_ hook: CoordinatorLifecycleHook) -> AnyPublisher<any Coordinator, Never> {
         if let hook = lifecycleHookStore[hook] {
             return hook.eraseToAnyPublisher()
         } else {
