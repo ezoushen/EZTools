@@ -16,10 +16,6 @@ enum CoordinatorKey {
 typealias LifecycleHookStore =
     [CoordinatorLifecycleHook: PassthroughSubject<any Coordinator, Never>]
 
-public protocol Coordinatable: AnyObject {
-    func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, waitUntilViewDismissed: Bool) -> AnyPublisher<Coordinator.Result, Coordinator.Failure>
-}
-
 public enum CoordinatorLifecycleHook: Hashable {
     case willCoordinate
     case didCoordinate
@@ -29,9 +25,13 @@ public enum CoordinatorLifecycleHook: Hashable {
     case didAttach
     case willDetach
     case didDetach
+    case willPresent
+    case didPresent
+    case willDismiss
+    case didDismiss
 }
 
-public protocol Coordinator: Coordinatable {
+public protocol Coordinator: AnyObject {
     associatedtype Result = Void
     associatedtype Failure = Never
     associatedtype View: ViewComponent
@@ -39,15 +39,13 @@ public protocol Coordinator: Coordinatable {
     associatedtype RootController: ViewHost = UIViewController
     associatedtype ResultPublisher: Publisher = AnyPublisher<Result, Failure> where ResultPublisher.Failure == Failure, ResultPublisher.Output == Result
         
+    var transitionHandler: ViewTransitionHandler<Controller, RootController> { get }
     var cancellables: Set<AnyCancellable> { get set }
     
     func makeViewModel() -> View.ViewModel
     func makeView(viewModel: View.ViewModel) -> View
     func makeController(from: UIViewController) -> Controller
-    
-    func present(viewController: Controller, parentViewController: RootController)
-    func dismiss(viewController: Controller, completion: (() -> Void)?)
-    
+        
     func route(with viewModel: View.ViewModel) -> ResultPublisher
     
     func willCoordinate<Child: Coordinator>(to coordinator: Child)
@@ -58,6 +56,12 @@ public protocol Coordinator: Coordinatable {
     func didAttach<Parent: Coordinator>(to parent: Parent)
     func willDetach<Parent: Coordinator>(from parent: Parent)
     func didDetach<Parent: Coordinator>(from parent: Parent)
+    func willPresent(controller: Controller)
+    func didPresent(controller: Controller)
+    func willDismiss(controller: Controller)
+    func didDismiss(controller: Controller)
+    
+    func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, animatePresentation: Bool, animateDismissal: Bool, waitUntilViewDismissed: Bool) -> AnyPublisher<Coordinator.Result, Coordinator.Failure>
 }
 
 public extension Coordinator {
@@ -69,9 +73,13 @@ public extension Coordinator {
     func didAttach<Parent: Coordinator>(to parent: Parent) { }
     func willDetach<Parent: Coordinator>(from parent: Parent) { }
     func didDetach<Parent: Coordinator>(from parent: Parent) { }
+    func willPresent(controller: Controller) { }
+    func didPresent(controller: Controller) { }
+    func willDismiss(controller: Controller) { }
+    func didDismiss(controller: Controller) { }
 }
 
-extension Coordinatable {
+extension Coordinator {
     public internal(set) var parent: (any Coordinator)? {
         get {
             objc_getAssociatedObject(self, &CoordinatorKey.parent) as? (any Coordinator)
@@ -110,28 +118,26 @@ extension Coordinatable {
         return table
     }
 }
-extension Coordinatable {
-    public func find<C: Coordinatable>(_ type: C.Type) -> C? {
+extension Coordinator {
+    public func find<C: Coordinator>(_ type: C.Type) -> C? {
         if self is C { return self as? C }
         
-        for child in (children.allObjects as! [Coordinatable]) {
-            guard let coordinator = child.find(type) else { continue }
+        for c in children.allObjects {
+            guard let child = c as? any Coordinator,
+                  let coordinator = child.find(type) else { continue }
             return coordinator
         }
         
         return nil
     }
     
-    public func findAll<C: Coordinatable>(_ type: C.Type) -> [C] {
+    public func findAll<C: Coordinator>(_ type: C.Type) -> [C] {
         if self is C { return [self as! C] }
         
-        return (children.allObjects as! [Coordinatable]).flatMap {
-            $0.findAll(type)
+        return children.allObjects.flatMap { c -> [C] in
+            guard let child = c as? any Coordinator else { return [] }
+            return child.findAll(type)
         }
-    }
-
-    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> {
-        coordinate(to: coordinator, waitUntilViewDismissed: false)
     }
 }
 
@@ -157,6 +163,10 @@ extension Coordinator {
         case .didAttach:        didAttach(to: object)
         case .willDetach:       willDetach(from: object)
         case .didDetach:        didDetach(from: object)
+        case .willPresent:      willPresent(controller: object.controller as! Self.Controller)
+        case .didPresent:       didPresent(controller: object.controller as! Self.Controller)
+        case .willDismiss:      willDismiss(controller: object.controller as! Self.Controller)
+        case .didDismiss:       didDismiss(controller: object.controller as! Self.Controller)
         }
     }
 }
@@ -199,8 +209,16 @@ extension Coordinator {
         return controller
     }
     
-    public func start(with parent: RootController) -> ResultPublisher {
-        present(viewController: controller, parentViewController: parent)
+    public func start(with parent: RootController, animated: Bool) -> ResultPublisher {
+        notify(hook: .willPresent, object: self)
+        transitionHandler.present(
+            viewController: controller,
+            parentViewController: parent,
+            animated: animated)
+        { [weak self] in
+            guard let self else { return }
+            self.notify(hook: .didPresent, object: self)
+        }
         return route(with: viewModel)
     }
     
@@ -223,7 +241,11 @@ extension Coordinator {
         coordinator.cancellables = []
     }
     
-    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, waitUntilViewDismissed: Bool) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> {
+    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, animated: Bool = true, waitUntilViewDismissed: Bool = false) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> {
+        coordinate(to: coordinator, animatePresentation: animated, animateDismissal: animated, waitUntilViewDismissed: waitUntilViewDismissed)
+    }
+    
+    public func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, animatePresentation: Bool = true, animateDismissal: Bool = true, waitUntilViewDismissed: Bool = false) -> AnyPublisher<Coordinator.Result, Coordinator.Failure> {
         guard !children.allObjects
             .map({ String(describing: type(of: $0))})
             .contains(String(describing: type(of: coordinator))) else {
@@ -243,7 +265,7 @@ extension Coordinator {
             fatalError("Wrong root controller type")
         }
         
-        return coordinator.start(with: controller)
+        return coordinator.start(with: controller, animated: animatePresentation)
             .flatMap { [weak coordinator]
                 value -> AnyPublisher<Coordinator.Result, Coordinator.Failure> in
                 View.setupAppearance()
@@ -252,14 +274,18 @@ extension Coordinator {
                         .setFailureType(to: Coordinator.Failure.self)
                         .eraseToAnyPublisher()
                 }
+                coordinator.notify(hook: .willDismiss, object: coordinator)
                 if waitUntilViewDismissed {
                     let subject = PassthroughSubject<Coordinator.Result, Coordinator.Failure>()
-                    coordinator.dismiss(viewController: coordinator.controller) {
+                    coordinator.transitionHandler.dismiss(viewController: coordinator.controller, animated: animateDismissal) {
+                        coordinator.notify(hook: .didDismiss, object: coordinator)
                         subject.send(value)
                     }
                     return subject.eraseToAnyPublisher()
                 } else {
-                    coordinator.dismiss(viewController: coordinator.controller, completion: nil)
+                    coordinator.transitionHandler.dismiss(viewController: coordinator.controller, animated: animateDismissal) {
+                        coordinator.notify(hook: .didDismiss, object: coordinator)
+                    }
                     return Just(value)
                         .setFailureType(to: Coordinator.Failure.self)
                         .eraseToAnyPublisher()
@@ -294,128 +320,18 @@ public extension Coordinator where Controller == UINavigationController {
 }
 
 public extension Coordinator where RootController: UINavigationController, Controller: UIViewController {
-    func present(viewController: Controller, parentViewController: RootController) {
-        parentViewController.pushViewController(viewController, animated: true)
-    }
-    
-    func dismiss(viewController: Controller, completion: (() -> Void)?) {
-        CATransaction.emit(completion: completion) {
-            viewController.navigationController?.popViewController(animated: true)
-        }
+    var transitionHandler: ViewTransitionHandler<Controller, RootController> {
+        .navigationController
     }
 }
 
 public extension Coordinator where RootController: UIViewController, Controller: UIViewController {
-    func present(viewController: Controller, parentViewController: RootController) {
-        parentViewController.present(viewController, animated: true, completion: nil)
+    var transitionHandler: ViewTransitionHandler<Controller, RootController> {
+        .default
     }
-    
-    func dismiss(viewController: Controller, completion: (() -> Void)?) {
-        defaultDismiss(viewController: viewController, completion: completion)
-    }
-
-    func defaultDismiss(viewController: Controller, completion: (() -> Void)?) {
-        if let navigationController = viewController.navigationController,
-           navigationController.children.first != viewController
-        {
-            CATransaction.emit(completion: completion) {
-                navigationController.popViewController(animated: true)
-            }
-        } else {
-            viewController.dismiss(animated: true, completion: completion)
-        }
-    }
-}
-
-public extension Coordinator where RootController == UIWindow {
-    func dismiss(viewController: Controller, completion: (() -> Void)?) { }
 }
 
 public extension Coordinator where View == EmptyView {
     func makeView(viewModel: View.ViewModel) -> EmptyView { .init() }
-    
     func makeViewModel() -> View.ViewModel { .init() }
-}
-
-public protocol RootCoordinator: Coordinator
-where RootController == UIWindow, View == EmptyView {
-    var window: UIWindow { get }
-    func route() -> ResultPublisher
-}
-
-public extension RootCoordinator where Controller == UIWindow {
-    func makeController(from viewController: UIViewController) -> Controller {
-        window
-    }
-}
-
-public extension RootCoordinator {
-    func present(viewController: Controller, parentViewController: RootController) { }
-    
-    func dismiss(viewController: Controller, completion: (() -> Void)?) { completion?() }
-    
-    func route(with viewModel: View.ViewModel) -> ResultPublisher {
-        route()
-    }
-    
-    func active() -> AnyCancellable {
-        if window.isKeyWindow {
-            UIWindow.rootWindow = window
-        }
-        
-        return route().sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-    }
-}
-
-public final class PlainCoordinator<View: ViewComponent, ViewModel: ObservableObject>: Coordinator where View.ViewModel == ViewModel {
-    
-    public init(view: View) {
-        self.view = view
-    }
-    
-    let view: View
-    
-    public func present(viewController: UIViewController, parentViewController: UIViewController) {
-        viewController.modalPresentationStyle = .overFullScreen
-        parentViewController.present(viewController, animated: false, completion: nil)
-    }
-    
-    public func makeViewModel() -> ViewModel {
-        view.viewModel
-    }
-    
-    public func makeView(viewModel: ViewModel) -> View {
-        view
-    }
-    
-    public func route(with viewModel: View.ViewModel) -> AnyPublisher<Void, Never> {
-        viewModel.willDismiss.eraseToAnyPublisher()
-    }
-}
-
-open class ActionCoordinator: Coordinator {
-    
-    private let action: () -> Void
-    
-    public init(action: @escaping () -> Void) {
-        self.action = action
-    }
-    
-    public func present(viewController: UIViewController, parentViewController: UIViewController) { }
-    
-    open func route(with viewModel: EmptyViewModel) -> AnyPublisher<Void, Never> {
-        
-        action()
-        
-        return Just(()).eraseToAnyPublisher()
-    }
-}
-
-extension CATransaction {
-    public static func emit(completion: (() -> Void)?, transaction: () -> Void) {
-        begin()
-        setCompletionBlock(completion)
-        transaction()
-        commit()
-    }
 }
