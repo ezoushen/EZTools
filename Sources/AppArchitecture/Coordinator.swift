@@ -62,6 +62,8 @@ public protocol Coordinator: AnyObject {
     func didDismiss(controller: Controller)
     
     func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, animatePresentation: Bool, animateDismissal: Bool, waitUntilViewDismissed: Bool) -> AnyPublisher<Coordinator.Result, Coordinator.Failure>
+
+    func lifecycleHook(_ hook: CoordinatorLifecycleHook) -> AnyPublisher<any Coordinator, Never>
 }
 
 public extension Coordinator {
