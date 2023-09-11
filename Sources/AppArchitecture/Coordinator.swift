@@ -64,6 +64,7 @@ public protocol Coordinator: AnyObject {
     func coordinate<Coordinator: AppArchitecture.Coordinator>(to coordinator: Coordinator, animatePresentation: Bool, animateDismissal: Bool, waitUntilViewDismissed: Bool) -> AnyPublisher<Coordinator.Result, Coordinator.Failure>
 
     func lifecycleHook(_ hook: CoordinatorLifecycleHook) -> AnyPublisher<any Coordinator, Never>
+    func notify(hook: CoordinatorLifecycleHook, object: any Coordinator)
 }
 
 public extension Coordinator {
@@ -154,7 +155,7 @@ extension Coordinator {
         }
     }
 
-    func notify(hook: CoordinatorLifecycleHook, object: any Coordinator) {
+    public func notify(hook: CoordinatorLifecycleHook, object: any Coordinator) {
         defer { lifecycleHookStore[hook]?.send(object) }
         switch hook {
         case .willCoordinate:   willCoordinate(to: object)
