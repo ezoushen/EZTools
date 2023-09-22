@@ -279,12 +279,12 @@ extension Coordinator {
                 }
                 coordinator.notify(hook: .willDismiss, object: coordinator)
                 if waitUntilViewDismissed {
-                    let subject = PassthroughSubject<Coordinator.Result, Coordinator.Failure>()
+                    let subject = CurrentValueSubject<Swift.Result<Coordinator.Result, Never>?, Coordinator.Failure>(nil)
                     coordinator.transitionHandler.dismiss(viewController: coordinator.controller, animated: animateDismissal) {
                         coordinator.notify(hook: .didDismiss, object: coordinator)
-                        subject.send(value)
+                        subject.send(.success(value))
                     }
-                    return subject.eraseToAnyPublisher()
+                    return subject.compactMap { try? $0?.get() }.eraseToAnyPublisher()
                 } else {
                     coordinator.transitionHandler.dismiss(viewController: coordinator.controller, animated: animateDismissal) {
                         coordinator.notify(hook: .didDismiss, object: coordinator)
