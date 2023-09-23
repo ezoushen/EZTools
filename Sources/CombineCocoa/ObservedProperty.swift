@@ -9,7 +9,8 @@ import Combine
 
 @propertyWrapper
 public class ObservedProperty<T> {
-    private let subject: PassthroughSubject<T, Never> = .init()
+    private let subject: CurrentValueSubject<T, Never>
+    private var value: T
 
     public static subscript<EnclosingSelf>(
         _enclosingInstance observed: EnclosingSelf,
@@ -27,8 +28,6 @@ public class ObservedProperty<T> {
         }
     }
 
-    private var value: T
-
     public var wrappedValue: T {
         get { fatalError("Please do not access this value directly") }
         set { fatalError("Please do not change this value directly") }
@@ -36,11 +35,10 @@ public class ObservedProperty<T> {
 
     public init(wrappedValue: T) {
         self.value = wrappedValue
+        self.subject = .init(wrappedValue)
     }
 
     public var projectedValue: AnyPublisher<T, Never> {
-        subject
-            .prepend(value)
-            .eraseToAnyPublisher()
+        subject.eraseToAnyPublisher()
     }
 }
