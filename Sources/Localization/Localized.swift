@@ -57,8 +57,8 @@ public struct Localized {
     @usableFromInline let bundle: Bundle
     @usableFromInline let comment: String?
     @usableFromInline let key: String
-    @usableFromInline let args: [CVarArg]
-    
+    @usableFromInline var args: [CVarArg]
+
     @usableFromInline init(key: String,
                            args: [CVarArg] = [],
                            tableName: String? = nil,
@@ -86,13 +86,17 @@ public struct Localized {
     @inline(__always)
     @inlinable
     public func callAsFunction(_ args: CVarArg...) -> String {
-        Localized(key: key, args: args, tableName: tableName, comment: comment).description
+        var this = self
+        this.args = args
+        return this.string
     }
 
     @inline(__always)
     @inlinable
     public func dynamicallyCall(withKeywordArguments pairs: KeyValuePairs<String, CVarArg>) -> String {
-        Localized(key: key, args: pairs.map{ $0.value }, tableName: tableName, comment: comment).string
+        var this = self
+        this.args = pairs.map{ $0.value }
+        return this.string
     }
 
     public var string: String {
