@@ -72,15 +72,17 @@ public struct Localized {
         self.comment = comment
     }
 
-    @inline(__always)
-    @inlinable
-    public static func callAsFunction(_ key: String,
-                                      tableName: String? = nil,
-                                      bundle: Bundle = .main,
-                                      comment: String? = nil,
-                                      args: CVarArg...) -> Localized
+    public init(_ key: String,
+         tableName: String? = nil,
+         bundle: Bundle = .main,
+         comment: String? = nil,
+         args: CVarArg...)
     {
-        Localized(key: key, args: args, tableName: tableName, comment: comment)
+        self.key = key
+        self.bundle = bundle
+        self.args = args
+        self.tableName = tableName
+        self.comment = comment
     }
 
     @inline(__always)
