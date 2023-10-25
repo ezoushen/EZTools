@@ -41,6 +41,9 @@ public protocol Coordinator: AnyObject {
         
     var transitionHandler: ViewTransitionHandler<Controller, RootController> { get }
     var cancellables: Set<AnyCancellable> { get set }
+    var controller: Controller { get }
+    var view: View { get }
+    var viewModel: View.ViewModel { get }
     
     func makeViewModel() -> View.ViewModel
     func makeView(viewModel: View.ViewModel) -> View
