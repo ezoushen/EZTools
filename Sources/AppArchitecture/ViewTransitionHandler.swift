@@ -3,24 +3,57 @@
 import Foundation
 import UIKit
 
-public struct ViewTransitionHandler<Controller: ViewHost, RootController: ViewHost> {
+public class ViewTransitionHandler<Controller: ViewHost, RootController: ViewHost> {
     public typealias Presentation = (_ viewController: Controller, _ parentViewController: RootController, _ animated: Bool, _ completion: (() -> Void)?) -> Void
     public typealias Dismissal = (_ viewController: Controller, _ animated: Bool, _ completion: (() -> Void)?) -> Void
     
     let _present: Presentation
     let _dismiss: Dismissal
-    
-    public init(present: @escaping Presentation, dismiss: @escaping Dismissal) {
+
+    private var _isPresenting: Bool = false
+    private var _isDismissing: Bool = false
+    private var _pendingPresent: (Controller, RootController, Bool, (() -> Void)?)? = nil
+    private var _pendingDismiss: (Controller, Bool, (() -> Void)?)? = nil
+
+    public required init(present: @escaping Presentation, dismiss: @escaping Dismissal) {
         self._present = present
         self._dismiss = dismiss
     }
     
     public func present(viewController: Controller, parentViewController: RootController, animated: Bool = true, completion: (() -> Void)? = nil) {
-        _present(viewController, parentViewController, animated, completion)
+        if _isDismissing {
+            _pendingPresent = (viewController, parentViewController, animated, completion)
+        } else if !_isPresenting {
+            _isPresenting = true
+            _present(viewController, parentViewController, animated) { [weak self] in
+                completion?()
+                guard let self else { return }
+                _isPresenting = false
+                guard let (viewController, animated, completion) = _pendingDismiss else { return }
+                dismiss(viewController: viewController, 
+                        animated: animated,
+                        completion: completion)
+            }
+        }
     }
     
     public func dismiss(viewController: Controller, animated: Bool = true, completion: (() -> Void)? = nil) {
-        _dismiss(viewController, animated, completion)
+        if _isPresenting {
+            _pendingDismiss = (viewController, animated, completion)
+        } else if !_isDismissing {
+            _isDismissing = true
+            _dismiss(viewController, animated) { [weak self] in
+                completion?()
+                guard let self else { return }
+                _isDismissing = false
+                guard let (viewController, parentViewController, animated, completion) =
+                        _pendingPresent else { return }
+                present(viewController: viewController,
+                        parentViewController: parentViewController,
+                        animated: animated,
+                        completion: completion)
+            }
+        }
     }
 }
 
