@@ -67,6 +67,7 @@ public struct KVOPublisher<T: NSObject, Output>: Combine.Publisher {
         private var subscriber: S?
         private var subject: NSObject?
 
+        private var isSubscribed: Bool = false
         private var waitingForCancellation: Bool = false
         private var lock = os_unfair_lock()
 
@@ -101,8 +102,10 @@ public struct KVOPublisher<T: NSObject, Output>: Combine.Publisher {
 
         func subscribe() {
             os_unfair_lock_lock(&lock)
-            subject?.addObserver(
-                self, forKeyPath: keyPath, options: options, context: nil)
+            if let subject {
+                subject.addObserver(self, forKeyPath: keyPath, options: options, context: nil)
+                isSubscribed = true
+            }
             if waitingForCancellation {
                 removeObservation()
             }
@@ -124,7 +127,9 @@ public struct KVOPublisher<T: NSObject, Output>: Combine.Publisher {
         }
 
         private func removeObservation() {
-            subject?.removeObserver(self, forKeyPath: keyPath)
+            if isSubscribed, let subject {
+                subject.removeObserver(self, forKeyPath: keyPath)
+            }
             subscriber?.receive(completion: .finished)
             subject = nil
             subscriber = nil
